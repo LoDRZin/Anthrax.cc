@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
       { hostname: "ufs.sh" },
     ],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;

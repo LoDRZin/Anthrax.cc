@@ -22,6 +22,7 @@ model Profile {
   avatarUrl      String?
   backgroundUrl  String?
   backgroundType String?  @default("image")
+  webglScene     String?
   discordId      String?
   theme          String?  @db.Text
   effect         String?
@@ -33,6 +34,18 @@ model Profile {
   user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   links          Link[]
   pageViews      PageView[]
+  widgets        Widget[]
+}
+
+model Widget {
+  id        String   @id @default(cuid())
+  profileId String
+  type      String   // "spotify", "weather", "wakatime"
+  config    String?  @db.Text // JSON stringificado
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 model Link {

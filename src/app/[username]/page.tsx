@@ -3,12 +3,18 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { headers } from "next/headers";
 import { createHash } from "crypto";
 import AudioGatekeeper from "@/components/public/AudioGatekeeper";
 import BackgroundParticles from "@/components/public/BackgroundParticles";
 import DiscordPresence from "@/components/public/DiscordPresence";
 import MagneticButton from "@/components/public/MagneticButton";
+import { WIDGET_REGISTRY } from "@/components/widgets/WidgetRegistry";
+
+const WebGLBackground = dynamic(() => import("@/components/public/WebGLBackground"), {
+  ssr: false, // O Canvas WebGL só existe no cliente (Browser)
+});
 
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }): Promise<Metadata> {
   const p = await params;
@@ -29,9 +35,12 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
 
 export default async function PublicProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const p = await params;
-  const profile = await prisma.profile.findUnique({
+  const profile = await prisma.profile.findUnique({ 
     where: { username: p.username },
-    include: { links: { orderBy: { order: "asc" } } },
+    include: { 
+      links: { orderBy: { order: "asc" } },
+      widgets: { where: { active: true }, orderBy: { order: "asc" } }
+    }
   });
 
   if (!profile) {
@@ -63,7 +72,12 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white relative flex justify-center items-center overflow-hidden">
-      <BackgroundParticles effect={profile.effect || "snow"} />
+      {profile.backgroundType === "webgl" ? (
+        <WebGLBackground scene={profile.webglScene || "synthwave"} />
+      ) : (
+        <BackgroundParticles effect={profile.effect || "snow"} />
+      )}
+      
       <AudioGatekeeper audioUrl={profile.audioUrl || undefined} />
       
       {/* Imagem de Fundo (Simulada para agora) */}
@@ -117,6 +131,23 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             </MagneticButton>
           ))}
         </div>
+
+        {/* Widgets Dinâmicos */}
+        {profile.widgets && profile.widgets.length > 0 && (
+          <div className="w-full mt-6 space-y-4">
+            {profile.widgets.map((widget) => {
+              const WidgetComponent = WIDGET_REGISTRY[widget.type];
+              if (!WidgetComponent) return null;
+              
+              let configObj = {};
+              try {
+                if (widget.config) configObj = JSON.parse(widget.config);
+              } catch (e) {}
+
+              return <WidgetComponent key={widget.id} config={configObj} />;
+            })}
+          </div>
+        )}
 
         {/* Views & Marca D'água */}
         <div className="mt-16 mb-4 flex flex-col items-center gap-2">

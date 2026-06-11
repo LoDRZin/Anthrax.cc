@@ -8,6 +8,7 @@ import { createHash } from "crypto";
 import AudioGatekeeper from "@/components/public/AudioGatekeeper";
 import BackgroundParticles from "@/components/public/BackgroundParticles";
 import DiscordPresence from "@/components/public/DiscordPresence";
+import MagneticButton from "@/components/public/MagneticButton";
 
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }): Promise<Metadata> {
   const p = await params;
@@ -107,17 +108,13 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         {/* Lista de Links */}
         <div className="w-full space-y-4 flex flex-col">
           {profile.links.map((link) => (
-            <a
-              key={link.id}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative w-full overflow-hidden rounded-xl p-4 flex items-center justify-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <div className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/20 group-hover:bg-white/20 transition-all duration-300" />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-              <span className="relative z-10 font-semibold text-lg drop-shadow-md">{link.title}</span>
-            </a>
+            <MagneticButton key={link.id} href={link.url} className="w-full">
+              <div className="group relative w-full overflow-hidden rounded-xl p-4 flex items-center justify-center">
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/20 group-hover:bg-white/20 transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative z-10 font-semibold text-lg drop-shadow-md">{link.title}</span>
+              </div>
+            </MagneticButton>
           ))}
         </div>
 

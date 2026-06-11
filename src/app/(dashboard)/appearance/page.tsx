@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import AppearanceForm from "@/components/dashboard/AppearanceForm";
+import AdvancedStylingForm from "@/components/dashboard/AdvancedStylingForm";
 
 export default async function AppearancePage() {
   const { userId } = await auth();
@@ -33,6 +34,15 @@ export default async function AppearancePage() {
         </CardHeader>
         <CardContent>
           <AppearanceForm profile={profileData} />
+        </CardContent>
+      </Card>
+      <Card className="bg-black/40 border-white/10 backdrop-blur-md">
+        <CardHeader>
+          <CardTitle>Estilização Avançada</CardTitle>
+          <CardDescription>Controle total sobre o design do seu perfil (Parte 1).</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AdvancedStylingForm uiConfigStr={profile.uiConfig} />
         </CardContent>
       </Card>
     </div>

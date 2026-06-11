@@ -12,12 +12,12 @@ export default function DiscordPresence({ discordId }: { discordId: string }) {
 
 
 
-  if (error || !data || !data.success) {
+  if (error || !data || data.success !== true || !data.data) {
     return null;
   }
 
   const lanyard = data.data;
-  const isOnline = lanyard.discord_status !== "offline";
+  const isOnline = lanyard?.discord_status && lanyard.discord_status !== "offline";
 
   return (
     <div className="flex items-center gap-3 p-3 bg-black/40 border border-white/10 rounded-xl backdrop-blur-md mb-6 w-full max-w-sm">

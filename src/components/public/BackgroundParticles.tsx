@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useAudioStore } from "@/store/audioStore";
 
 export default function BackgroundParticles({ effect }: { effect?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -71,9 +72,13 @@ export default function BackgroundParticles({ effect }: { effect?: string }) {
     const animate = () => {
       ctx.clearRect(0, 0, width, height);
 
+      const bassIntensity = useAudioStore.getState().getBassIntensity();
+      const sizeMultiplier = 1 + bassIntensity * 2; // Partículas até 3x maiores na batida
+      const speedMultiplier = 1 + bassIntensity * 1.5; // Até 2.5x mais rápidas
+
       for (const p of particles) {
-        p.x += p.speedX;
-        p.y += p.speedY;
+        p.x += p.speedX * speedMultiplier;
+        p.y += p.speedY * speedMultiplier;
 
         // Wrap particles
         if (p.y > height) p.y = 0;
@@ -81,12 +86,14 @@ export default function BackgroundParticles({ effect }: { effect?: string }) {
         if (p.x > width) p.x = 0;
         if (p.x < 0) p.x = width;
 
+        const currentSize = p.size * sizeMultiplier;
+
         ctx.beginPath();
         if (effect === "matrix") {
           ctx.fillStyle = `rgba(0,255,65,${p.opacity})`;
-          ctx.fillRect(p.x, p.y, p.size, p.size);
+          ctx.fillRect(p.x, p.y, currentSize, currentSize);
         } else {
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, currentSize, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(255,255,255,${p.opacity})`;
           ctx.fill();
         }

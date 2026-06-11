@@ -75,7 +75,10 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       {/* Container Principal Glassmorphism */}
       <div className="relative z-10 w-full max-w-lg mx-auto p-6 flex flex-col items-center">
         {/* Avatar */}
-        <div className="w-28 h-28 rounded-full border-4 border-white/20 overflow-hidden mb-6 backdrop-blur-sm shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+        <div 
+          className="w-28 h-28 rounded-full border-4 border-white/20 overflow-hidden mb-6 backdrop-blur-sm"
+          style={{ boxShadow: '0 0 calc(30px + var(--bass, 0) * 150px) rgba(255,255,255,0.3)' }}
+        >
           <Image 
             src={profile.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.username}`} 
             alt={profile.displayName || profile.username}

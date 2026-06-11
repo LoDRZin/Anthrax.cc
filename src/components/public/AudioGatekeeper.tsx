@@ -3,16 +3,21 @@
 import { useEffect, useState, useRef } from "react";
 import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAudioStore } from "@/store/audioStore";
 
 export default function AudioGatekeeper({ audioUrl }: { audioUrl?: string }) {
   const [hasEntered, setHasEntered] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (audioUrl) {
       audioRef.current = new Audio(audioUrl);
+      audioRef.current.crossOrigin = "anonymous"; // Essential for CORS Web Audio API
       audioRef.current.loop = true;
     }
     return () => {
@@ -20,6 +25,13 @@ export default function AudioGatekeeper({ audioUrl }: { audioUrl?: string }) {
         audioRef.current.pause();
         audioRef.current = null;
       }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      useAudioStore.getState().setIsActive(false);
     };
   }, [audioUrl]);
 
@@ -28,6 +40,40 @@ export default function AudioGatekeeper({ audioUrl }: { audioUrl?: string }) {
     if (audioRef.current) {
       audioRef.current.play().catch(console.error);
       setIsPlaying(true);
+
+      // Initialize Web Audio API on user gesture
+      if (!audioContextRef.current) {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        const ctx = new AudioContextClass();
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 256; // 128 data bins
+        
+        const source = ctx.createMediaElementSource(audioRef.current);
+        source.connect(analyser);
+        analyser.connect(ctx.destination);
+        
+        audioContextRef.current = ctx;
+        analyserRef.current = analyser;
+
+        const updateFrequencyData = () => {
+          if (analyserRef.current) {
+            const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+            analyserRef.current.getByteFrequencyData(dataArray);
+            useAudioStore.getState().setFrequencyData(dataArray);
+            
+            // Inject bass intensity into CSS globally
+            const bass = useAudioStore.getState().getBassIntensity();
+            document.documentElement.style.setProperty('--bass', bass.toString());
+            
+            animationRef.current = requestAnimationFrame(updateFrequencyData);
+          }
+        };
+        
+        updateFrequencyData();
+        useAudioStore.getState().setIsActive(true);
+      } else if (audioContextRef.current.state === "suspended") {
+        audioContextRef.current.resume();
+      }
     }
   };
 

@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  profile   Profile?
+}
+
+model Profile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  username       String   @unique
+  displayName    String?
+  bio            String?
+  avatarUrl      String?
+  backgroundUrl  String?
+  backgroundType String?  @default("image")
+  discordId      String?
+  theme          String?  @db.Text
+  effect         String?
+  audioUrl       String?
+  views          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  links          Link[]
+  pageViews      PageView[]
+}
+
+model Link {
+  id        String   @id @default(cuid())
+  profileId String
+  title     String
+  url       String
+  icon      String?
+  order     Int      @default(0)
+
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  profileId String
+  ipHash    String
+  createdAt DateTime @default(now())
+
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}

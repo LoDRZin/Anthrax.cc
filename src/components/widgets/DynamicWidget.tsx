@@ -3,7 +3,8 @@
 import dynamic from "next/dynamic";
 
 const WeatherWidget = dynamic(() => import("./WeatherWidget"), { ssr: false });
-// const SpotifyWidget = dynamic(() => import("./SpotifyWidget"), { ssr: false });
+const SpotifyWidget = dynamic(() => import("./SpotifyWidget"), { ssr: false });
+const SoundcloudWidget = dynamic(() => import("./SoundcloudWidget"), { ssr: false });
 
 export function DynamicWidget({ widget }: { widget: any }) {
   let configObj = {};
@@ -15,9 +16,13 @@ export function DynamicWidget({ widget }: { widget: any }) {
     return <WeatherWidget config={configObj} />;
   }
   
-  // if (widget.type === "spotify") {
-  //   return <SpotifyWidget config={configObj} />;
-  // }
+  if (widget.type === "spotify") {
+    return <SpotifyWidget config={configObj} />;
+  }
+
+  if (widget.type === "soundcloud") {
+    return <SoundcloudWidget config={configObj} />;
+  }
 
   return null;
 }

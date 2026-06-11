@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getLinks, createLink } from "@/server/actions/links";
+import { createMusicWidget } from "@/server/actions/widgets";
 import LinksList from "@/components/dashboard/LinksList";
 import { Plus } from "lucide-react";
 import { revalidatePath } from "next/cache";
@@ -18,6 +19,15 @@ export default async function LinksPage() {
     revalidatePath("/links");
   }
 
+  async function addWidget(formData: FormData) {
+    "use server";
+    const type = formData.get("type") as "spotify" | "soundcloud";
+    const url = formData.get("url") as string;
+    if (!type || !url) return;
+    await createMusicWidget(type, url);
+    revalidatePath("/links");
+  }
+
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       <div>
@@ -31,12 +41,32 @@ export default async function LinksPage() {
           <CardDescription>Insira a URL e um título atrativo.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={addLink} className="flex gap-4">
+          <form action={addLink} className="flex flex-col sm:flex-row gap-4">
             <Input name="title" placeholder="Título (ex: Meu Discord)" className="flex-1 bg-black/50 border-white/10" required />
             <Input name="url" type="url" placeholder="https://..." className="flex-1 bg-black/50 border-white/10" required />
             <Button type="submit">
               <Plus className="h-4 w-4 mr-2" />
-              Adicionar
+              Adicionar Link
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-black/40 border-white/10 backdrop-blur-md">
+        <CardHeader>
+          <CardTitle>Adicionar Widget de Música (Spotify/SoundCloud)</CardTitle>
+          <CardDescription>Cole o link direto da música ou playlist para criar um player na sua página.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form action={addWidget} className="flex flex-col sm:flex-row gap-4">
+            <select name="type" className="flex h-9 w-full sm:w-[150px] rounded-md border border-white/10 bg-black/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-white">
+              <option value="spotify" className="bg-[#0a0a0a]">Spotify</option>
+              <option value="soundcloud" className="bg-[#0a0a0a]">SoundCloud</option>
+            </select>
+            <Input name="url" type="url" placeholder="URL da música (Ex: https://open.spotify.com/...)" className="flex-1 bg-black/50 border-white/10" required />
+            <Button type="submit" variant="secondary">
+              <Plus className="h-4 w-4 mr-2" />
+              Adicionar Widget
             </Button>
           </form>
         </CardContent>

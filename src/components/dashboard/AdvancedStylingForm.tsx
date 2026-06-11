@@ -24,7 +24,13 @@ export default function AdvancedStylingForm({ uiConfigStr }: { uiConfigStr: stri
       glassIntensity: "10px",
       noiseOverlay: false,
       customCss: "",
-      videoBgUrl: ""
+      videoBgUrl: "",
+      playerStyle: "minimalist",
+      playerPosition: "bottom-center",
+      reverbEffect: false,
+      nightAudioUrl: "",
+      loadingText: "Click to Enter",
+      enterAnimation: "fade"
     };
   });
 
@@ -166,6 +172,94 @@ export default function AdvancedStylingForm({ uiConfigStr }: { uiConfigStr: stri
             checked={!!config.noiseOverlay}
             onCheckedChange={(checked) => updateField("noiseOverlay", checked)}
           />
+        </div>
+
+        {/* --- SESSÃO DE ÁUDIO E MULTIMÍDIA --- */}
+        <div className="col-span-1 sm:col-span-2 pt-6 border-t border-white/10 mt-2">
+          <h3 className="text-lg font-bold mb-4">🎵 Áudio e Player (Parte 2)</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            
+            {/* Player Style */}
+            <div className="space-y-3">
+              <Label>Estilo do Player</Label>
+              <Select value={config.playerStyle || "minimalist"} onValueChange={(val) => updateField("playerStyle", val)}>
+                <SelectTrigger className="bg-black/50 border-white/10">
+                  <SelectValue placeholder="Selecione o estilo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="minimalist">Minimalista</SelectItem>
+                  <SelectItem value="neon">Neon (Glow)</SelectItem>
+                  <SelectItem value="retro">Retrô (Pixel)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Player Position */}
+            <div className="space-y-3">
+              <Label>Posição do Player</Label>
+              <Select value={config.playerPosition || "bottom-center"} onValueChange={(val) => updateField("playerPosition", val)}>
+                <SelectTrigger className="bg-black/50 border-white/10">
+                  <SelectValue placeholder="Selecione a posição" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bottom-center">Inferior Central</SelectItem>
+                  <SelectItem value="bottom-left">Inferior Esquerdo</SelectItem>
+                  <SelectItem value="top-right">Superior Direito</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Loading Text */}
+            <div className="space-y-3">
+              <Label>Texto de Entrada</Label>
+              <Input 
+                value={config.loadingText || "Click to Enter"} 
+                onChange={(e) => updateField("loadingText", e.target.value)}
+                className="bg-black/50 border-white/10"
+                placeholder="Ex: Click to Enter"
+              />
+            </div>
+
+            {/* Enter Animation */}
+            <div className="space-y-3">
+              <Label>Animação de Entrada</Label>
+              <Select value={config.enterAnimation || "fade"} onValueChange={(val) => updateField("enterAnimation", val)}>
+                <SelectTrigger className="bg-black/50 border-white/10">
+                  <SelectValue placeholder="Selecione a animação" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fade">Fade Suave</SelectItem>
+                  <SelectItem value="zoom">Zoom Out</SelectItem>
+                  <SelectItem value="glitch">Glitch Attack</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Night Audio */}
+            <div className="space-y-3 sm:col-span-2">
+              <Label>Música Noturna (URL - Opcional)</Label>
+              <Input 
+                value={config.nightAudioUrl || ""} 
+                onChange={(e) => updateField("nightAudioUrl", e.target.value)}
+                className="bg-black/50 border-white/10"
+                placeholder="https://..."
+              />
+              <p className="text-xs text-white/50">Se preenchido, o site tocará essa música de noite (18h-06h) em vez da música principal.</p>
+            </div>
+
+            {/* Reverb Toggle */}
+            <div className="space-y-3 sm:col-span-2 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+              <div>
+                <Label className="text-base font-semibold">Efeito de Áudio 3D (Reverb/Catedral)</Label>
+                <p className="text-sm text-white/60">Aplica eco ao áudio de fundo usando Web Audio API.</p>
+              </div>
+              <Switch 
+                checked={!!config.reverbEffect}
+                onCheckedChange={(checked) => updateField("reverbEffect", checked)}
+              />
+            </div>
+
+          </div>
         </div>
       </div>
 

@@ -23,6 +23,7 @@ model Profile {
   backgroundUrl  String?
   backgroundType String?  @default("image")
   webglScene     String?
+  uiConfig       String?  @db.Text // Json contendo CSS, cursor, layout, borders, noise, etc
   discordId      String?
   theme          String?  @db.Text
   effect         String?

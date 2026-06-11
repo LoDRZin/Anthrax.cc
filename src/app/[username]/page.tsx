@@ -9,6 +9,9 @@ import BackgroundParticles from "@/components/public/BackgroundParticles";
 import DiscordPresence from "@/components/public/DiscordPresence";
 import MagneticButton from "@/components/public/MagneticButton";
 import { DynamicWidget } from "@/components/widgets/DynamicWidget";
+import CursorFollower from "@/components/public/CursorFollower";
+import VideoBackground from "@/components/public/VideoBackground";
+import NoiseOverlay from "@/components/public/NoiseOverlay";
 import { headers } from "next/headers";
 import { createHash } from "crypto";
 import ClientWebGL from "@/components/public/ClientWebGL";
@@ -67,10 +70,30 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   // Pega o total real de views
   const updatedProfile = await prisma.profile.findUnique({ where: { id: profile.id }, select: { views: true } });
 
+  // Parse das configurações estéticas avançadas (Parte 1)
+  let uiConfig: any = {};
+  try {
+    if (profile.uiConfig) uiConfig = JSON.parse(profile.uiConfig);
+  } catch (e) {}
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white relative flex justify-center items-center overflow-hidden">
+    <div 
+      className="min-h-screen bg-[#0a0a0a] text-white relative flex justify-center items-center overflow-hidden"
+      style={{
+        '--accent-color': uiConfig.accentColor || '#ffffff',
+        '--border-radius': uiConfig.borderRadius || '12px',
+        '--glass-intensity': uiConfig.glassIntensity || '10px',
+        '--glow-color': uiConfig.glowColor || 'rgba(255,255,255,0.1)'
+      } as React.CSSProperties}
+    >
+      {uiConfig.customCss && <style dangerouslySetInnerHTML={{ __html: uiConfig.customCss }} />}
+      {uiConfig.noiseOverlay && <NoiseOverlay />}
+      <CursorFollower cursorStyle={uiConfig.cursorStyle || "default"} />
+
       {profile.backgroundType === "webgl" ? (
         <ClientWebGL scene={profile.webglScene || "synthwave"} />
+      ) : profile.backgroundType === "video" ? (
+        <VideoBackground videoUrl={uiConfig.videoBgUrl} />
       ) : (
         <BackgroundParticles effect={profile.effect || "snow"} />
       )}
@@ -116,14 +139,26 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           <DiscordPresence discordId={profile.discordId} />
         )}
 
-        {/* Lista de Links */}
-        <div className="w-full space-y-4 flex flex-col">
+        {/* Lista de Links Dinâmica */}
+        <div className={`w-full flex ${
+          uiConfig.layout === "grid" ? "flex-row flex-wrap justify-center gap-4" : "flex-col space-y-4"
+        }`}>
           {profile.links.map((link) => (
-            <MagneticButton key={link.id} href={link.url} className="w-full">
-              <div className="group relative w-full overflow-hidden rounded-xl p-4 flex items-center justify-center">
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/20 group-hover:bg-white/20 transition-all duration-300" />
+            <MagneticButton key={link.id} href={link.url} className={uiConfig.layout === "grid" ? "w-[47%]" : "w-full"}>
+              <div 
+                className="group relative w-full overflow-hidden p-4 flex items-center justify-center transition-all duration-300 backdrop-blur-md"
+                style={{ 
+                  borderRadius: 'var(--border-radius)', 
+                  boxShadow: '0 4px 20px var(--glow-color)',
+                  backdropFilter: 'blur(var(--glass-intensity))',
+                  WebkitBackdropFilter: 'blur(var(--glass-intensity))',
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}
+              >
+                <div className="absolute inset-0 bg-white/5 group-hover:bg-white/10 transition-all duration-300" />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                <span className="relative z-10 font-semibold text-lg drop-shadow-md">{link.title}</span>
+                <span className="relative z-10 font-semibold text-lg drop-shadow-md" style={{ color: 'var(--accent-color)' }}>{link.title}</span>
               </div>
             </MagneticButton>
           ))}

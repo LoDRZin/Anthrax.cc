@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
-import { ExternalLink, Eye, Link as LinkIcon, Activity } from "lucide-react";
+import { ExternalLink, Eye, Link as LinkIcon, Activity, Palette, Settings } from "lucide-react";
 import { DashboardPageTransition } from "@/components/dashboard/DashboardPageTransition";
 import { MagicCard } from "@/components/magicui/magic-card";
 

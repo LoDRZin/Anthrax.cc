@@ -25,6 +25,7 @@ import { StyledButton } from "@/components/dashboard/StyledButton";
 import { ToggleSwitch } from "@/components/dashboard/ToggleSwitch";
 import { LiveProfilePreview } from "@/components/dashboard/LiveProfilePreview";
 import { useProfileStore } from "@/store/profile-store";
+import { ErrorBoundary } from "@/components/dashboard/ErrorBoundary";
 
 type ProfileData = {
   displayName: string;
@@ -237,23 +238,25 @@ export default function AppearanceForm({ profile }: { profile: ProfileData }) {
                         onChange={(e) => store.setAvatarUrl(e.target.value)}
                       />
                     </div>
-                    <UploadButton
-                      endpoint="imageUploader"
-                      onClientUploadComplete={(res) => {
-                        if (res?.[0]) {
-                          store.setAvatarUrl(res[0].url);
-                          toast.success("Foto carregada com sucesso!");
-                        }
-                      }}
-                      onUploadError={(error: Error) => {
-                        toast.error(`Falha no upload: ${error.message}`);
-                      }}
-                      appearance={{
-                        button: "bg-white/5 hover:bg-white/10 text-white font-semibold border border-white/10 text-xs h-11 px-5 rounded-xl transition-all duration-300 cursor-pointer",
-                        allowedContent: "hidden",
-                      }}
-                      content={{ button: "Upload Imagem" }}
-                    />
+                    <ErrorBoundary fallback={<div className="text-xs text-white/30 font-mono py-3">Serviço de upload indisponível</div>}>
+                      <UploadButton
+                        endpoint="imageUploader"
+                        onClientUploadComplete={(res) => {
+                          if (res?.[0]) {
+                            store.setAvatarUrl(res[0].url);
+                            toast.success("Foto carregada com sucesso!");
+                          }
+                        }}
+                        onUploadError={(error: Error) => {
+                          toast.error(`Falha no upload: ${error.message}`);
+                        }}
+                        appearance={{
+                          button: "bg-white/5 hover:bg-white/10 text-white font-semibold border border-white/10 text-xs h-11 px-5 rounded-xl transition-all duration-300 cursor-pointer",
+                          allowedContent: "hidden",
+                        }}
+                        content={{ button: "Upload Imagem" }}
+                      />
+                    </ErrorBoundary>
                   </div>
 
                   {/* IA generator box */}
@@ -300,23 +303,25 @@ export default function AppearanceForm({ profile }: { profile: ProfileData }) {
                         onChange={(e) => store.setBackgroundUrl(e.target.value)}
                       />
                     </div>
-                    <UploadButton
-                      endpoint="imageUploader"
-                      onClientUploadComplete={(res) => {
-                        if (res?.[0]) {
-                          store.setBackgroundUrl(res[0].url);
-                          toast.success("Plano de fundo carregado com sucesso!");
-                        }
-                      }}
-                      onUploadError={(error: Error) => {
-                        toast.error(`Falha no upload: ${error.message}`);
-                      }}
-                      appearance={{
-                        button: "bg-white/5 hover:bg-white/10 text-white font-semibold border border-white/10 text-xs h-11 px-5 rounded-xl transition-all duration-300 cursor-pointer",
-                        allowedContent: "hidden",
-                      }}
-                      content={{ button: "Upload Imagem" }}
-                    />
+                    <ErrorBoundary fallback={<div className="text-xs text-white/30 font-mono py-3">Serviço de upload indisponível</div>}>
+                      <UploadButton
+                        endpoint="imageUploader"
+                        onClientUploadComplete={(res) => {
+                          if (res?.[0]) {
+                            store.setBackgroundUrl(res[0].url);
+                            toast.success("Plano de fundo carregado com sucesso!");
+                          }
+                        }}
+                        onUploadError={(error: Error) => {
+                          toast.error(`Falha no upload: ${error.message}`);
+                        }}
+                        appearance={{
+                          button: "bg-white/5 hover:bg-white/10 text-white font-semibold border border-white/10 text-xs h-11 px-5 rounded-xl transition-all duration-300 cursor-pointer",
+                          allowedContent: "hidden",
+                        }}
+                        content={{ button: "Upload Imagem" }}
+                      />
+                    </ErrorBoundary>
                   </div>
 
                   <div className="w-full">
@@ -344,23 +349,25 @@ export default function AppearanceForm({ profile }: { profile: ProfileData }) {
                         onChange={(e) => store.setAudioUrl(e.target.value)}
                       />
                     </div>
-                    <UploadButton
-                      endpoint="audioUploader"
-                      onClientUploadComplete={(res) => {
-                        if (res?.[0]) {
-                          store.setAudioUrl(res[0].url);
-                          toast.success("Música carregada com sucesso!");
-                        }
-                      }}
-                      onUploadError={(error: Error) => {
-                        toast.error(`Falha no upload: ${error.message}`);
-                      }}
-                      appearance={{
-                        button: "bg-white/5 hover:bg-white/10 text-white font-semibold border border-white/10 text-xs h-11 px-5 rounded-xl transition-all duration-300 cursor-pointer",
-                        allowedContent: "hidden",
-                      }}
-                      content={{ button: "Upload Áudio" }}
-                    />
+                    <ErrorBoundary fallback={<div className="text-xs text-white/30 font-mono py-3">Serviço de upload indisponível</div>}>
+                      <UploadButton
+                        endpoint="audioUploader"
+                        onClientUploadComplete={(res) => {
+                          if (res?.[0]) {
+                            store.setAudioUrl(res[0].url);
+                            toast.success("Música carregada com sucesso!");
+                          }
+                        }}
+                        onUploadError={(error: Error) => {
+                          toast.error(`Falha no upload: ${error.message}`);
+                        }}
+                        appearance={{
+                          button: "bg-white/5 hover:bg-white/10 text-white font-semibold border border-white/10 text-xs h-11 px-5 rounded-xl transition-all duration-300 cursor-pointer",
+                          allowedContent: "hidden",
+                        }}
+                        content={{ button: "Upload Áudio" }}
+                      />
+                    </ErrorBoundary>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -783,7 +790,9 @@ export default function AppearanceForm({ profile }: { profile: ProfileData }) {
 
       {/* Right Visual Preview Panel (Sticky Desktop Phone) */}
       <div className="lg:col-span-4 sticky top-24 hidden lg:block select-none z-20">
-        <LiveProfilePreview />
+        <ErrorBoundary fallback={<div className="p-8 border border-white/5 rounded-2xl bg-black/40 text-center text-white/40 text-xs font-semibold select-none">Falha ao carregar o visualizador do celular</div>}>
+          <LiveProfilePreview />
+        </ErrorBoundary>
       </div>
     </div>
   );

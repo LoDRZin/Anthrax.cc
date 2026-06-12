@@ -1,6 +1,9 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ptBR } from "@clerk/localizations";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -38,6 +41,7 @@ export default async function DashboardLayout({
 
   return (
     <ClerkProvider localization={ptBR}>
+      <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
       <div className="flex h-screen w-full bg-[#030303] text-white relative font-sans overflow-hidden">
         {/* Background Noise overlay */}
         <div 

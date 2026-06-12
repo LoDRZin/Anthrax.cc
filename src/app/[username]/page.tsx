@@ -51,42 +51,64 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
 
 export default async function PublicProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const p = await params;
+  // Query principal sem guestbook/ratings para evitar crash se as tabelas não existirem
   const profile = await prisma.profile.findUnique({ 
     where: { username: p.username },
     include: { 
       links: { orderBy: { order: "asc" } },
       widgets: { where: { active: true }, orderBy: { order: "asc" } },
-      guestbook: { orderBy: { createdAt: "desc" } },
-      ratings: true
     }
   });
+
+  // Tenta carregar guestbook e ratings separadamente (resiliente a tabelas ausentes)
+  let guestbookEntries: any[] = [];
+  let ratingsEntries: any[] = [];
+  if (profile) {
+    try {
+      guestbookEntries = await prisma.guestbookEntry.findMany({
+        where: { profileId: profile.id },
+        orderBy: { createdAt: "desc" },
+      });
+    } catch {}
+    try {
+      ratingsEntries = await prisma.profileRating.findMany({
+        where: { profileId: profile.id },
+      });
+    } catch {}
+  }
 
   if (!profile) {
     notFound();
   }
 
   // Registra a view com IP real hasheado para evitar inflação por F5
-  const headersList = await headers();
-  const rawIp = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "unknown";
-  const ip = rawIp.split(",")[0].trim();
-  const ipHash = createHash("sha256").update(ip + profile.id).digest("hex");
+  let viewCount = profile.views || 0;
+  try {
+    const headersList = await headers();
+    const rawIp = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "unknown";
+    const ip = rawIp.split(",")[0].trim();
+    const ipHash = createHash("sha256").update(ip + profile.id).digest("hex");
 
-  // Verifica se esse IP já viu hoje (anti-spam de F5)
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const alreadyViewed = await prisma.pageView.findFirst({
-    where: { profileId: profile.id, ipHash, createdAt: { gte: today } },
-  });
+    // Verifica se esse IP já viu hoje (anti-spam de F5)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const alreadyViewed = await prisma.pageView.findFirst({
+      where: { profileId: profile.id, ipHash, createdAt: { gte: today } },
+    });
 
-  if (!alreadyViewed) {
-    await Promise.all([
-      prisma.pageView.create({ data: { profileId: profile.id, ipHash } }),
-      prisma.profile.update({ where: { id: profile.id }, data: { views: { increment: 1 } } }),
-    ]);
+    if (!alreadyViewed) {
+      await Promise.all([
+        prisma.pageView.create({ data: { profileId: profile.id, ipHash } }),
+        prisma.profile.update({ where: { id: profile.id }, data: { views: { increment: 1 } } }),
+      ]);
+    }
+
+    // Pega o total real de views
+    const updatedProfile = await prisma.profile.findUnique({ where: { id: profile.id }, select: { views: true } });
+    viewCount = updatedProfile?.views || profile.views || 0;
+  } catch {
+    // PageView table may not exist yet on Vercel — silently skip
   }
-
-  // Pega o total real de views
-  const updatedProfile = await prisma.profile.findUnique({ where: { id: profile.id }, select: { views: true } });
 
   // Parse das configurações estéticas avançadas (Parte 1)
   let uiConfig: any = {};

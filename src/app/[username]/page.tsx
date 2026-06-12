@@ -83,11 +83,12 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   // Registra a view com IP real hasheado para evitar inflação por F5
   let viewCount = profile.views || 0;
+  let ipHash = "unknown";
   try {
     const headersList = await headers();
     const rawIp = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "unknown";
     const ip = rawIp.split(",")[0].trim();
-    const ipHash = createHash("sha256").update(ip + profile.id).digest("hex");
+    ipHash = createHash("sha256").update(ip + profile.id).digest("hex");
 
     // Verifica se esse IP já viu hoje (anti-spam de F5)
     const today = new Date();

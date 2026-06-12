@@ -30,7 +30,16 @@ export default function AdvancedStylingForm({ uiConfigStr }: { uiConfigStr: stri
       reverbEffect: false,
       nightAudioUrl: "",
       loadingText: "Click to Enter",
-      enterAnimation: "fade"
+      enterAnimation: "fade",
+      // Part 3
+      enable3dTilt: false,
+      typewriterBio: false,
+      glitchAvatar: false,
+      avatarPulse: false,
+      linkHoverEffect: "default",
+      particleInteraction: false,
+      staggeredEntry: false,
+      confettiEnabled: true
     };
   });
 
@@ -261,6 +270,94 @@ export default function AdvancedStylingForm({ uiConfigStr }: { uiConfigStr: stri
 
           </div>
         </div>
+
+        {/* --- SESSÃO DE INTERATIVIDADE (PARTE 3) --- */}
+        <div className="col-span-1 sm:col-span-2 pt-6 border-t border-white/10 mt-2">
+          <h3 className="text-lg font-bold mb-4">✨ Interatividade e Animações (Parte 3)</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+            {/* Link Hover Effect */}
+            <div className="space-y-3">
+              <Label>Efeito Hover nos Links</Label>
+              <Select value={config.linkHoverEffect || "default"} onValueChange={(val) => updateField("linkHoverEffect", val)}>
+                <SelectTrigger className="bg-black/50 border-white/10">
+                  <SelectValue placeholder="Selecione o efeito" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="default">Magnético (Padrão)</SelectItem>
+                  <SelectItem value="glow">Glow Intensivo</SelectItem>
+                  <SelectItem value="ripple">Ripple (Ondas)</SelectItem>
+                  <SelectItem value="shake">Tremor (Shake)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Tilt 3D */}
+            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+              <div>
+                <Label className="font-semibold">Tilt 3D no Hover</Label>
+                <p className="text-xs text-white/60">O card se inclina com o mouse.</p>
+              </div>
+              <Switch checked={!!config.enable3dTilt} onCheckedChange={(val) => updateField("enable3dTilt", val)} />
+            </div>
+
+            {/* Typewriter Bio */}
+            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+              <div>
+                <Label className="font-semibold">Bio Digitada (Typewriter)</Label>
+                <p className="text-xs text-white/60">Digita a bio letra por letra.</p>
+              </div>
+              <Switch checked={!!config.typewriterBio} onCheckedChange={(val) => updateField("typewriterBio", val)} />
+            </div>
+
+            {/* Avatar Pulse */}
+            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+              <div>
+                <Label className="font-semibold">Avatar Pulsante</Label>
+                <p className="text-xs text-white/60">Borda respira suavemente.</p>
+              </div>
+              <Switch checked={!!config.avatarPulse} onCheckedChange={(val) => updateField("avatarPulse", val)} />
+            </div>
+
+            {/* Avatar Glitch */}
+            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+              <div>
+                <Label className="font-semibold">Avatar Glitch Hover</Label>
+                <p className="text-xs text-white/60">Falha digital no mouse.</p>
+              </div>
+              <Switch checked={!!config.glitchAvatar} onCheckedChange={(val) => updateField("glitchAvatar", val)} />
+            </div>
+
+            {/* Staggered Entry */}
+            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+              <div>
+                <Label className="font-semibold">Entrada em Cascata</Label>
+                <p className="text-xs text-white/60">Links entram um por um.</p>
+              </div>
+              <Switch checked={!!config.staggeredEntry} onCheckedChange={(val) => updateField("staggeredEntry", val)} />
+            </div>
+
+            {/* Confetti */}
+            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+              <div>
+                <Label className="font-semibold">Explosão de Confete</Label>
+                <p className="text-xs text-white/60">Ao clicar em botões no perfil.</p>
+              </div>
+              <Switch checked={!!config.confettiEnabled} onCheckedChange={(val) => updateField("confettiEnabled", val)} />
+            </div>
+
+            {/* Particle Interaction */}
+            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+              <div>
+                <Label className="font-semibold">Partículas Repelidas</Label>
+                <p className="text-xs text-white/60">Neve/Matrix fogem do cursor.</p>
+              </div>
+              <Switch checked={!!config.particleInteraction} onCheckedChange={(val) => updateField("particleInteraction", val)} />
+            </div>
+
+          </div>
+        </div>
+
       </div>
 
       <Button type="submit" className="w-full sm:w-auto" disabled={isSaving}>

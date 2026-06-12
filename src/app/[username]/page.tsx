@@ -8,6 +8,10 @@ import AudioGatekeeper from "@/components/public/AudioGatekeeper";
 import BackgroundParticles from "@/components/public/BackgroundParticles";
 import DiscordPresence from "@/components/public/DiscordPresence";
 import MagneticButton from "@/components/public/MagneticButton";
+import TiltCard from "@/components/public/TiltCard";
+import TypewriterText from "@/components/public/TypewriterText";
+import ConfettiWrapper from "@/components/public/ConfettiWrapper";
+import StaggerContainer from "@/components/public/StaggerContainer";
 import { DynamicWidget } from "@/components/widgets/DynamicWidget";
 import CursorFollower from "@/components/public/CursorFollower";
 import VideoBackground from "@/components/public/VideoBackground";
@@ -95,7 +99,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       ) : profile.backgroundType === "video" ? (
         <VideoBackground videoUrl={uiConfig.videoBgUrl} />
       ) : (
-        <BackgroundParticles effect={profile.effect || "snow"} />
+        <BackgroundParticles effect={profile.effect || "snow"} interact={!!uiConfig.particleInteraction} />
       )}
       
       <AudioGatekeeper audioUrl={profile.audioUrl || undefined} />
@@ -110,28 +114,36 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       {/* Container Principal Glassmorphism */}
       <div className="relative z-10 w-full max-w-lg mx-auto p-6 flex flex-col items-center">
         {/* Avatar */}
-        <div 
-          className="w-28 h-28 rounded-full border-4 border-white/20 overflow-hidden mb-6 backdrop-blur-sm"
-          style={{ boxShadow: '0 0 calc(30px + var(--bass, 0) * 150px) rgba(255,255,255,0.3)' }}
-        >
-          <Image 
-            src={profile.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.username}`} 
-            alt={profile.displayName || profile.username}
-            width={112}
-            height={112}
-            className="w-full h-full object-cover"
-            priority
-          />
-        </div>
+        <TiltCard enabled={!!uiConfig.enable3dTilt}>
+          <ConfettiWrapper enabled={!!uiConfig.confettiEnabled}>
+            <div 
+              className={`w-28 h-28 rounded-full border-4 border-white/20 overflow-hidden mb-6 backdrop-blur-sm cursor-pointer ${
+                uiConfig.glitchAvatar ? "hover:animate-pulse hover:mix-blend-difference" : ""
+              } ${uiConfig.avatarPulse ? "animate-pulse" : ""} transition-all duration-300 hover:scale-105`}
+              style={{ boxShadow: '0 0 calc(30px + var(--bass, 0) * 150px) rgba(255,255,255,0.3)' }}
+            >
+              <Image 
+                src={profile.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.username}`} 
+                alt={profile.displayName || profile.username}
+                width={112}
+                height={112}
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
+          </ConfettiWrapper>
+        </TiltCard>
 
         {/* Info */}
         <h1 className="text-3xl font-bold mb-2 tracking-tight drop-shadow-md text-center">
           {profile.displayName || profile.username}
         </h1>
         {profile.bio && (
-          <p className="text-white/80 text-center mb-6 max-w-sm drop-shadow-sm font-medium">
-            {profile.bio}
-          </p>
+          <TypewriterText 
+            text={profile.bio} 
+            enabled={!!uiConfig.typewriterBio}
+            className="text-white/80 text-center mb-6 max-w-sm drop-shadow-sm font-medium" 
+          />
         )}
 
         {/* Discord Lanyard */}
@@ -140,29 +152,45 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         )}
 
         {/* Lista de Links Dinâmica */}
-        <div className={`w-full flex ${
-          uiConfig.layout === "grid" ? "flex-row flex-wrap justify-center gap-4" : "flex-col space-y-4"
-        }`}>
-          {profile.links.map((link) => (
-            <MagneticButton key={link.id} href={link.url} className={uiConfig.layout === "grid" ? "w-[47%]" : "w-full"}>
-              <div 
-                className="group relative w-full overflow-hidden p-4 flex items-center justify-center transition-all duration-300 backdrop-blur-md"
-                style={{ 
-                  borderRadius: 'var(--border-radius)', 
-                  boxShadow: '0 4px 20px var(--glow-color)',
-                  backdropFilter: 'blur(var(--glass-intensity))',
-                  WebkitBackdropFilter: 'blur(var(--glass-intensity))',
-                  backgroundColor: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)'
-                }}
-              >
-                <div className="absolute inset-0 bg-white/5 group-hover:bg-white/10 transition-all duration-300" />
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                <span className="relative z-10 font-semibold text-lg drop-shadow-md" style={{ color: 'var(--accent-color)' }}>{link.title}</span>
-              </div>
-            </MagneticButton>
-          ))}
-        </div>
+        <StaggerContainer 
+          enabled={!!uiConfig.staggeredEntry} 
+          className={`w-full flex ${
+            uiConfig.layout === "grid" ? "flex-row flex-wrap justify-center gap-4" : "flex-col space-y-4"
+          }`}
+        >
+          {profile.links.map((link) => {
+            
+            // Lógica de Efeitos Hover
+            let hoverClass = "group-hover:bg-white/10";
+            if (uiConfig.linkHoverEffect === "glow") hoverClass = "group-hover:bg-[var(--accent-color)] group-hover:opacity-20";
+            if (uiConfig.linkHoverEffect === "ripple") hoverClass = "group-active:bg-white/30 group-hover:bg-white/10";
+            if (uiConfig.linkHoverEffect === "shake") hoverClass = "hover:animate-bounce group-hover:bg-white/10";
+
+            return (
+              <MagneticButton key={link.id} href={link.url} className={uiConfig.layout === "grid" ? "w-[47%]" : "w-full"}>
+                <ConfettiWrapper enabled={!!uiConfig.confettiEnabled} className="w-full">
+                  <div 
+                    className={`group relative w-full overflow-hidden p-4 flex items-center justify-center transition-all duration-300 backdrop-blur-md ${
+                      uiConfig.linkHoverEffect === "shake" ? "hover:animate-pulse" : ""
+                    }`}
+                    style={{ 
+                      borderRadius: 'var(--border-radius)', 
+                      boxShadow: '0 4px 20px var(--glow-color)',
+                      backdropFilter: 'blur(var(--glass-intensity))',
+                      WebkitBackdropFilter: 'blur(var(--glass-intensity))',
+                      backgroundColor: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.1)'
+                    }}
+                  >
+                    <div className={`absolute inset-0 bg-white/5 transition-all duration-300 ${hoverClass}`} />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                    <span className="relative z-10 font-semibold text-lg drop-shadow-md" style={{ color: 'var(--accent-color)' }}>{link.title}</span>
+                  </div>
+                </ConfettiWrapper>
+              </MagneticButton>
+            );
+          })}
+        </StaggerContainer>
 
         {/* Widgets Dinâmicos */}
         {profile.widgets && profile.widgets.length > 0 && (

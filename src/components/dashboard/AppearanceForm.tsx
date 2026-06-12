@@ -146,6 +146,8 @@ export default function AppearanceForm({ profile }: { profile: ProfileAppearance
           <option value="none" className="bg-[#0a0a0a]">Nenhum</option>
           <option value="snow" className="bg-[#0a0a0a]">Neve (Snow)</option>
           <option value="matrix" className="bg-[#0a0a0a]">Matrix</option>
+          <option value="fogo" className="bg-[#0a0a0a]">Fogo</option>
+          <option value="bolhas" className="bg-[#0a0a0a]">Bolhas</option>
         </select>
       </div>
 

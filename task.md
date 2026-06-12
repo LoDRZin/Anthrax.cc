@@ -1,53 +1,36 @@
-# Tarefas de Desenvolvimento do Anthrax.cc
+# Checklist de Implementação - Dashboard UI/UX
 
-Esta é a lista de tarefas passo a passo para construir a plataforma, dividida em 10 etapas principais para um fluxo de trabalho organizado.
+Este é o acompanhamento passo a passo da reestruturação visual completa do painel de administração e da página de aparência do Anthrax.cc.
 
-- `[x]` **Tarefa 1: Setup Inicial do Projeto**
-  - `[x]` Inicializar Next.js (App Router)
-  - `[x]` Configurar Tailwind CSS
-  - `[x]` Instalar e inicializar o Shadcn UI
-  - `[x]` Criar a estrutura básica de diretórios (`/(dashboard)` e `/(public)`)
-
-- `[x]` **Tarefa 2: Configuração de Banco de Dados**
-  - `[x]` Configurar Supabase (ou Vercel Postgres / Neon)
-  - `[x]` Inicializar o Prisma ORM
-  - `[x]` Escrever o schema do banco (User, Profile, Link, PageView)
-  - `[x]` Rodar a migration inicial
-
-- `[x]` **Tarefa 3: Sistema de Autenticação**
-  - `[x]` Implementar login e cadastro (Supabase Auth ou Clerk)
-  - `[x]` Criar um middleware para proteger as rotas do `/dashboard`
-  - `[x]` Associar o usuário recém-criado a um perfil vazio no banco
-
-- `[x]` **Tarefa 4: Dashboard - Layout Base e Configurações**
-  - `[x]` Criar o layout lateral do painel (Sidebar)
-  - `[x]` Criar a página de "Settings" para o usuário definir seu `username`, `displayName` e `bio`
-  - `[x]` Criar Server Actions para atualizar os dados do perfil
-
-- `[x]` **Tarefa 5: Dashboard - Gerenciamento de Links**
-  - `[x]` Criar a interface de Links (CRUD)
-  - `[x]` Implementar ordenação Drag & Drop (`dnd-kit`)
-  - `[x]` Salvar as mudanças de links no banco via Server Actions
-
-- `[x]` **Tarefa 6: Upload e Armazenamento de Mídias**
-  - `[x]` Criar a página "Appearance" do painel para inputs de mídia
-  - `[x]` Setup base para Avatar, Audio e Background URLs
-
-- `[x]` **Tarefa 7: Rota Dinâmica (Página Pública) e SEO**
-  - `[x]` Criar o componente de servidor da rota `/[username]`
-  - `[x]` Fazer o fetch do banco com base no slug da URL
-  - `[x]` Implementar a injeção de SEO dinâmico (`generateMetadata`) com OpenGraph tags
-
-- `[x]` **Tarefa 8: UI/UX - Glassmorphism e Tema**
-  - `[x]` Implementar a estética glassmorphism no perfil público
-  - `[x]` Renderizar os links do perfil de forma atraente
-  - `[x]` Implementar componente para gerenciar o background
-
-- `[x]` **Tarefa 9: Multimídia - Áudio e Partículas**
-  - `[x]` Implementar o componente `AudioGatekeeper` para contornar bloqueio de Autoplay
-  - `[x]` Instalar e configurar `@tsparticles/react` para efeitos de neve/matriz
-
-- `[x]` **Tarefa 10: Integrações Avançadas e Finalização**
-  - `[x]` Criar o componente de status do Discord com uso da API Lanyard
-  - `[x]` Implementar o sistema de contador de Views
-  - `[x]` Finalizado para testes gerais
+- `[x]` **FASE 1: Sidebar + Layout Base**
+  - `[x]` Criar estrutura com sidebar fixa à esquerda + conteúdo principal à direita (`src/app/(dashboard)/layout.tsx`)
+  - `[x]` Implementar a sidebar com vidro fosco e largura fixa de 256px (`src/components/dashboard/Sidebar.tsx`)
+  - `[x]` Adicionar 5 itens de navegação com ícones da biblioteca Lucide
+  - `[x]` Implementar transição suave de itens ativos com Framer Motion (`layoutId="active-sidebar-item"`)
+  - `[x]` Criar rodapé com informações do usuário em card estilizado
+  - `[x]` Desenvolver menu gaveta animado para visualização em dispositivos móveis (`src/components/dashboard/MobileMenu.tsx`)
+- `[x]` **FASE 2: Componentes Base**
+  - `[x]` Implementar `StyledInput` com ring animado no foco
+  - `[x]` Implementar `StyledButton` com gradiente roxo/azul premium
+  - `[x]` Implementar `ToggleSwitch` animado com Framer Motion
+  - `[x]` Implementar `SectionCard` com glassmorphism real (`backdrop-blur-3xl bg-black/40`)
+- `[x]` **FASE 3: Sistema de Estado (Context/Store)**
+  - `[x]` Criar Contexto/Store React para sincronização em tempo real entre formulário e preview
+- `[x]` **FASE 4: LiveProfilePreview (Mock de Celular)**
+  - `[x]` Desenvolver o preview de celular interativo e reativo no dashboard
+- `[x]` **FASE 5: Refatoração da Página de Aparência**
+  - `[x]` Reestruturar layout da página de aparência para split-screen (formulário à esquerda, celular à direita)
+- `[x]` **FASE 6: Polimentos e Efeitos Visuais**
+  - `[x]` Adicionar glows de fundo dinâmicos (ambient glow)
+  - `[x]` Adicionar textura com noise overlay
+  - `[x]` Implementar micro-animações de entrada e transições de layout
+- `[x]` **FASE 7: Estilização Premium da Página de Entrada (Landing Page)**
+  - `[x]` Integrar fundo interativo 3D/partículas (ex: `WebGLBackground` estrelado ou efeito de grid)
+  - `[x]` Aplicar tipografia com gradientes sofisticados, bordas de neon suave e efeitos dinâmicos de texto
+  - `[x]` Implementar animações de entrada com Framer Motion na estrutura principal
+  - `[x]` Estilizar os botões de ação e modais de login/cadastro para seguir o design system do painel
+- `[ ]` **FASE 8: Depuração e Resolução do Erro no Vercel (Página /appearance)**
+  - `[ ]` Analisar logs de runtime da Vercel para identificar a causa raiz do erro "This page couldn't load"
+  - `[ ]` Revisar e garantir compatibilidade completa de SSR (Server-Side Rendering) no `LiveProfilePreview` e `AppearanceForm`
+  - `[ ]` Testar localmente simulando produção (`npm run build && npm run start`)
+  - `[ ]` Validar a integridade das variáveis de ambiente de produção (Clerk e Banco de Dados)

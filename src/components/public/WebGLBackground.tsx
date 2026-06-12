@@ -62,12 +62,14 @@ function StarsScene() {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
+          args={[positions, 3]}
           count={1000}
           array={positions}
           itemSize={3}
         />
         <bufferAttribute
           attach="attributes-size"
+          args={[sizes, 1]}
           count={1000}
           array={sizes}
           itemSize={1}

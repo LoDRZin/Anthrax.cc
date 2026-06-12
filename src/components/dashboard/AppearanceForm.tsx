@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UploadButton } from "@/utils/uploadthing";
 import { updateAppearance, updateAdvancedStyling } from "@/server/actions/appearance";
 import "@uploadthing/react/styles.css";
@@ -10,7 +10,6 @@ import {
   Image as ImageIcon,
   Music,
   User,
-  Wand2,
   Palette,
   Type,
   Layout,
@@ -25,6 +24,7 @@ import { StyledInput } from "@/components/dashboard/StyledInput";
 import { StyledButton } from "@/components/dashboard/StyledButton";
 import { ToggleSwitch } from "@/components/dashboard/ToggleSwitch";
 import { LiveProfilePreview } from "@/components/dashboard/LiveProfilePreview";
+import { useProfileStore } from "@/store/profile-store";
 
 type ProfileData = {
   displayName: string;
@@ -65,87 +65,49 @@ const HOVER_EFFECTS = [
   { value: "shake", label: "Tremor (Shake)" },
 ];
 
-const PLAYER_STYLES = [
-  { value: "minimalist", label: "Minimalista" },
-  { value: "neon", label: "Neon (Glow)" },
-  { value: "retro", label: "Retrô (Pixel)" },
-];
-
-const PLAYER_POSITIONS = [
-  { value: "bottom-center", label: "Inferior Central" },
-  { value: "bottom-left", label: "Inferior Esquerdo" },
-  { value: "top-right", label: "Superior Direito" },
-];
-
 export default function AppearanceForm({ profile }: { profile: ProfileData }) {
   // Tabs: 'media' | 'styling' | 'effects' | 'extras'
   const [activeTab, setActiveTab] = useState<"media" | "styling" | "effects" | "extras">("media");
-  
-  // Basic attributes state
-  const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl);
-  const [backgroundUrl, setBackgroundUrl] = useState(profile.backgroundUrl);
-  const [audioUrl, setAudioUrl] = useState(profile.audioUrl);
-  const [effect, setEffect] = useState(profile.effect);
   const [isSaving, setIsSaving] = useState(false);
 
   // AI Prompt Generator
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
 
-  // Parse config safely
-  const [config, setConfig] = useState(() => {
-    const defaultConfigs = {
-      layout: "default",
-      cursorStyle: "default",
-      borderRadius: "12px",
-      glowColor: "rgba(255,255,255,0.15)",
-      accentColor: "#ffffff",
-      glassIntensity: "10px",
-      noiseOverlay: false,
-      customCss: "",
-      videoBgUrl: "",
-      playerStyle: "minimalist",
-      playerPosition: "bottom-center",
-      reverbEffect: false,
-      nightAudioUrl: "",
-      loadingText: "Click to Enter",
-      enterAnimation: "fade",
-      enable3dTilt: false,
-      typewriterBio: false,
-      glitchAvatar: false,
-      avatarPulse: false,
-      linkHoverEffect: "default",
-      particleInteraction: false,
-      staggeredEntry: false,
-      confettiEnabled: true,
-      fontFamily: "Inter",
-      textShadow: "",
-      letterSpacing: "normal",
-      lineHeight: "1.5",
-      textAlign: "center",
-      textTransform: "none",
-      textGradient: "",
-      rotatingBio: false,
-      rotatingWords: "Designer, Developer, Creator",
-      monoFont: false,
-      enableGuestbook: false,
-      enableRating: false,
-      enableVisitorThemes: false,
-      enableFocusMode: false,
-      manualStatus: "",
-    };
+  const store = useProfileStore();
 
+  // Initialize store with server data
+  useEffect(() => {
+    let parsedConfig = {};
     try {
       if (profile.uiConfig) {
-        const parsed = JSON.parse(profile.uiConfig);
-        return { ...defaultConfigs, ...parsed };
+        parsedConfig = JSON.parse(profile.uiConfig);
       }
-    } catch {}
-    return defaultConfigs;
-  });
+    } catch (e) {
+      console.error("Error parsing profile UI config:", e);
+    }
+
+    store.initialize({
+      avatarUrl: profile.avatarUrl,
+      backgroundUrl: profile.backgroundUrl,
+      audioUrl: profile.audioUrl,
+      effect: profile.effect,
+      displayName: profile.displayName,
+      username: profile.username,
+      bio: profile.bio,
+      config: parsedConfig as any,
+    });
+  }, [profile, store]);
+
+  // Read state from Zustand store
+  const avatarUrl = store.isInitialized ? store.avatarUrl : profile.avatarUrl;
+  const backgroundUrl = store.isInitialized ? store.backgroundUrl : profile.backgroundUrl;
+  const audioUrl = store.isInitialized ? store.audioUrl : profile.audioUrl;
+  const effect = store.isInitialized ? store.effect : profile.effect;
+  const config = store.config;
 
   const updateConfig = (field: string, value: any) => {
-    setConfig((prev: any) => ({ ...prev, [field]: value }));
+    store.updateConfig(field as any, value);
   };
 
   const handleGenerateAiAvatar = () => {
@@ -158,7 +120,7 @@ export default function AppearanceForm({ profile }: { profile: ProfileData }) {
     const img = new globalThis.Image();
     img.src = url;
     img.onload = () => {
-      setAvatarUrl(url);
+      store.setAvatarUrl(url);
       setIsGeneratingAi(false);
       toast.success("Avatar gerado com IA carregado com sucesso!");
     };
@@ -251,14 +213,14 @@ export default function AppearanceForm({ profile }: { profile: ProfileData }) {
                         label="URL da Imagem"
                         placeholder="https://imgur.com/sua-imagem.png"
                         value={avatarUrl}
-                        onChange={(e) => setAvatarUrl(e.target.value)}
+                        onChange={(e) => store.setAvatarUrl(e.target.value)}
                       />
                     </div>
                     <UploadButton
                       endpoint="imageUploader"
                       onClientUploadComplete={(res) => {
                         if (res?.[0]) {
-                          setAvatarUrl(res[0].url);
+                          store.setAvatarUrl(res[0].url);
                           toast.success("Foto carregada com sucesso!");
                         }
                       }}
@@ -314,14 +276,14 @@ export default function AppearanceForm({ profile }: { profile: ProfileData }) {
                         label="URL do Plano de Fundo"
                         placeholder="https://imgur.com/seu-fundo.gif"
                         value={backgroundUrl}
-                        onChange={(e) => setBackgroundUrl(e.target.value)}
+                        onChange={(e) => store.setBackgroundUrl(e.target.value)}
                       />
                     </div>
                     <UploadButton
                       endpoint="imageUploader"
                       onClientUploadComplete={(res) => {
                         if (res?.[0]) {
-                          setBackgroundUrl(res[0].url);
+                          store.setBackgroundUrl(res[0].url);
                           toast.success("Plano de fundo carregado com sucesso!");
                         }
                       }}
@@ -358,14 +320,14 @@ export default function AppearanceForm({ profile }: { profile: ProfileData }) {
                         label="URL da Música de Fundo"
                         placeholder="https://site.com/musica.mp3"
                         value={audioUrl}
-                        onChange={(e) => setAudioUrl(e.target.value)}
+                        onChange={(e) => store.setAudioUrl(e.target.value)}
                       />
                     </div>
                     <UploadButton
                       endpoint="audioUploader"
                       onClientUploadComplete={(res) => {
                         if (res?.[0]) {
-                          setAudioUrl(res[0].url);
+                          store.setAudioUrl(res[0].url);
                           toast.success("Música carregada com sucesso!");
                         }
                       }}
@@ -603,7 +565,7 @@ export default function AppearanceForm({ profile }: { profile: ProfileData }) {
                   </label>
                   <select
                     value={effect}
-                    onChange={(e) => setEffect(e.target.value)}
+                    onChange={(e) => store.setEffect(e.target.value)}
                     className="flex h-11 w-full rounded-xl border border-white/10 bg-black/40 px-3 text-sm focus:outline-none focus:border-purple-500/50 text-white backdrop-blur-md cursor-pointer"
                   >
                     <option value="none" className="bg-[#0a0a0a]">Nenhum</option>
@@ -800,16 +762,7 @@ export default function AppearanceForm({ profile }: { profile: ProfileData }) {
 
       {/* Right Visual Preview Panel (Sticky Desktop Phone) */}
       <div className="lg:col-span-4 sticky top-24 hidden lg:block select-none z-20">
-        <LiveProfilePreview
-          avatarUrl={avatarUrl}
-          backgroundUrl={backgroundUrl}
-          audioUrl={audioUrl}
-          effect={effect}
-          displayName={profile.displayName}
-          username={profile.username}
-          bio={profile.bio}
-          config={config}
-        />
+        <LiveProfilePreview />
       </div>
     </div>
   );

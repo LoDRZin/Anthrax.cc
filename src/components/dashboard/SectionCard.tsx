@@ -27,7 +27,7 @@ export function SectionCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: "easeOut", delay }}
       className={cn(
-        "relative rounded-2xl bg-[#080808]/40 border border-white/5 backdrop-blur-xl shadow-2xl p-6 md:p-8 overflow-hidden group/card transition-all duration-500 hover:border-white/10",
+        "relative rounded-2xl bg-black/40 border border-white/5 backdrop-blur-3xl shadow-2xl p-6 md:p-8 overflow-hidden group/card transition-all duration-500 hover:border-white/10",
         className
       )}
     >

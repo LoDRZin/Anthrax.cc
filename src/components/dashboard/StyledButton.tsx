@@ -1,13 +1,14 @@
 "use client";
 
-import React, { ButtonHTMLAttributes } from "react";
-import { motion } from "framer-motion";
+import React from "react";
+import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-interface StyledButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface StyledButtonProps extends Omit<HTMLMotionProps<"button">, "children" | "className"> {
   isLoading?: boolean;
   variant?: "primary" | "secondary" | "danger" | "ghost";
   children: React.ReactNode;
+  className?: string;
 }
 
 export function StyledButton({

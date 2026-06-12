@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -48,16 +48,19 @@ export default function LinksList({ initialLinks }: { initialLinks: Link[] }) {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  async function handleDragEnd(event: { active: { id: string }; over: { id: string } | null }) {
+  async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
     if (!over || active.id === over.id) return;
 
+    const activeId = String(active.id);
+    const overId = String(over.id);
+
     let reordered: { id: string; order: number }[] = [];
 
     setLinks((items) => {
-      const oldIndex = items.findIndex((i) => i.id === active.id);
-      const newIndex = items.findIndex((i) => i.id === over.id);
+      const oldIndex = items.findIndex((i) => i.id === activeId);
+      const newIndex = items.findIndex((i) => i.id === overId);
       const newArray = arrayMove(items, oldIndex, newIndex);
       reordered = newArray.map((l, index) => ({ id: l.id, order: index }));
       return newArray;

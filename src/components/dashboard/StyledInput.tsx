@@ -34,18 +34,18 @@ export const StyledInput = React.forwardRef<HTMLInputElement, StyledInputProps>(
               "w-full h-11 bg-black/40 border border-white/10 rounded-xl px-4 text-sm text-white placeholder-white/30 backdrop-blur-md outline-none transition-all duration-300",
               Icon ? "pl-11" : "pl-4",
               error
-                ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/10"
-                : "hover:border-white/20 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/10",
+                ? "border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                : "hover:border-white/20 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               className
             )}
             {...props}
           />
-          {/* Subtle glow container */}
+          {/* Subtle glow container behind input */}
           <div
             className={cn(
               "absolute inset-0 -z-10 rounded-xl blur-md transition-all duration-300 pointer-events-none opacity-0 group-focus-within/input:opacity-100",
-              error ? "bg-red-500/5" : "bg-purple-500/5"
+              error ? "bg-red-500/10 shadow-[0_0_15px_rgba(239,68,68,0.15)]" : "bg-purple-500/10 shadow-[0_0_15px_rgba(168,85,247,0.15)]"
             )}
           />
         </div>

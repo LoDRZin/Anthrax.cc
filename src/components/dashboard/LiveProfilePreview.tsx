@@ -2,18 +2,20 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Globe, Mail, MessageSquare, Play, Sparkles, Star } from "lucide-react";
+import { Globe, MessageSquare, Play, Star } from "lucide-react";
 import { FaInstagram, FaGithub, FaTwitter } from "react-icons/fa";
+import { useProfileStore } from "@/store/profile-store";
+import { cn } from "@/lib/utils";
 
 interface LiveProfilePreviewProps {
-  avatarUrl: string;
-  backgroundUrl: string;
-  audioUrl: string;
-  effect: string;
-  displayName: string;
-  username: string;
-  bio: string;
-  config: {
+  avatarUrl?: string;
+  backgroundUrl?: string;
+  audioUrl?: string;
+  effect?: string;
+  displayName?: string;
+  username?: string;
+  bio?: string;
+  config?: {
     layout: string;
     cursorStyle: string;
     borderRadius: string;
@@ -43,17 +45,9 @@ interface LiveProfilePreviewProps {
   };
 }
 
-export function LiveProfilePreview({
-  avatarUrl,
-  backgroundUrl,
-  audioUrl,
-  effect,
-  displayName,
-  username,
-  bio,
-  config,
-}: LiveProfilePreviewProps) {
+export function LiveProfilePreview(props: LiveProfilePreviewProps) {
   const [greeting, setGreeting] = useState("Boa noite");
+  const store = useProfileStore();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -62,13 +56,22 @@ export function LiveProfilePreview({
     else setGreeting("Boa noite");
   }, []);
 
-  const fontName = config.fontFamily || "Inter";
+  // Use Zustand store if initialized, otherwise fallback to props
+  const avatarUrl = store.isInitialized ? store.avatarUrl : (props.avatarUrl || "");
+  const backgroundUrl = store.isInitialized ? store.backgroundUrl : (props.backgroundUrl || "");
+  const audioUrl = store.isInitialized ? store.audioUrl : (props.audioUrl || "");
+  const effect = store.isInitialized ? store.effect : (props.effect || "none");
+  const displayName = store.isInitialized ? store.displayName : (props.displayName || "");
+  const username = store.isInitialized ? store.username : (props.username || "");
+  const bio = store.isInitialized ? store.bio : (props.bio || "");
+  const config = store.isInitialized ? store.config : props.config;
+
+  const fontName = config?.fontFamily || "Inter";
   const fontUrl = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, "+")}:wght@300;400;500;600;700&display=swap`;
 
-  // Helper for alignment
   const getAlignmentClass = () => {
-    if (config.textAlign === "left") return "text-left items-start";
-    if (config.textAlign === "right") return "text-right items-end";
+    if (config?.textAlign === "left") return "text-left items-start";
+    if (config?.textAlign === "right") return "text-right items-end";
     return "text-center items-center";
   };
 
@@ -92,15 +95,15 @@ export function LiveProfilePreview({
         {/* Inner Screen Viewport */}
         <div
           className={`flex-1 relative overflow-hidden flex flex-col p-4 pt-10 text-white ${
-            config.monoFont ? "font-mono" : ""
+            config?.monoFont ? "font-mono" : ""
           }`}
           style={{
-            fontFamily: config.monoFont ? "monospace" : `'${fontName}', sans-serif`,
-            lineHeight: config.lineHeight || "1.5",
+            fontFamily: config?.monoFont ? "monospace" : `'${fontName}', sans-serif`,
+            lineHeight: config?.lineHeight || "1.5",
           }}
         >
           {/* Simulated Noise overlay */}
-          {config.noiseOverlay && (
+          {config?.noiseOverlay && (
             <div
               className="absolute inset-0 opacity-[0.03] pointer-events-none z-20"
               style={{
@@ -110,7 +113,7 @@ export function LiveProfilePreview({
           )}
 
           {/* Background video simulation or image background */}
-          {config.videoBgUrl ? (
+          {config?.videoBgUrl ? (
             <div className="absolute inset-0 bg-[#020202] z-0">
               <video
                 src={config.videoBgUrl}
@@ -196,7 +199,7 @@ export function LiveProfilePreview({
           {/* Profile Card Container */}
           <div className="relative z-10 flex-1 flex flex-col items-center justify-start overflow-y-auto scrollbar-none py-4">
             {/* Status Badge */}
-            {config.manualStatus && (
+            {config?.manualStatus && (
               <div className="bg-white/10 text-white/95 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-semibold border border-white/10 mb-4 tracking-wide shadow-sm animate-bounce">
                 {config.manualStatus}
               </div>
@@ -206,11 +209,11 @@ export function LiveProfilePreview({
             <div
               className={cn(
                 "w-20 h-20 rounded-full border-2 border-white/20 overflow-hidden mb-4 backdrop-blur-sm shadow-xl transition-all duration-300",
-                config.avatarPulse ? "animate-pulse" : "",
-                config.glitchAvatar ? "hover:scale-105 active:skew-x-12" : ""
+                config?.avatarPulse ? "animate-pulse" : "",
+                config?.glitchAvatar ? "hover:scale-105 active:skew-x-12" : ""
               )}
               style={{
-                boxShadow: `0 0 20px ${config.glowColor || "rgba(255,255,255,0.15)"}`,
+                boxShadow: `0 0 20px ${config?.glowColor || "rgba(255,255,255,0.15)"}`,
               }}
             >
               <Image
@@ -230,15 +233,15 @@ export function LiveProfilePreview({
             <h1
               className="text-lg font-bold tracking-tight drop-shadow-md text-center transition-all"
               style={{
-                textShadow: config.textShadow || "none",
+                textShadow: config?.textShadow || "none",
                 letterSpacing:
-                  config.letterSpacing !== "normal" ? config.letterSpacing : undefined,
+                  config?.letterSpacing !== "normal" ? config?.letterSpacing : undefined,
               }}
             >
               <span className="block text-[9px] text-white/40 tracking-wider uppercase font-semibold">
                 {greeting},
               </span>
-              {config.textGradient ? (
+              {config?.textGradient ? (
                 <span
                   style={{
                     backgroundImage: config.textGradient,
@@ -263,7 +266,7 @@ export function LiveProfilePreview({
                   getAlignmentClass()
                 )}
               >
-                {config.rotatingBio && config.rotatingWords ? (
+                {config?.rotatingBio && config?.rotatingWords ? (
                   <span>
                     {bio.replace(/\{.*\}/, config.rotatingWords.split(",")[0].trim())}
                   </span>
@@ -288,7 +291,7 @@ export function LiveProfilePreview({
             <div
               className={cn(
                 "w-full max-w-[260px] mt-4 flex",
-                config.layout === "grid"
+                config?.layout === "grid"
                   ? "flex-row flex-wrap justify-between gap-2"
                   : "flex-col space-y-2.5"
               )}
@@ -302,18 +305,18 @@ export function LiveProfilePreview({
                   key={i}
                   className={cn(
                     "relative overflow-hidden p-2.5 flex items-center justify-center border transition-all duration-300 backdrop-blur-md",
-                    config.layout === "grid" ? "w-[48%]" : "w-full"
+                    config?.layout === "grid" ? "w-[48%]" : "w-full"
                   )}
                   style={{
-                    borderRadius: config.borderRadius || "12px",
+                    borderRadius: config?.borderRadius || "12px",
                     borderColor: "rgba(255,255,255,0.06)",
-                    boxShadow: `0 2px 10px ${config.glowColor || "rgba(255,255,255,0.05)"}`,
+                    boxShadow: `0 2px 10px ${config?.glowColor || "rgba(255,255,255,0.05)"}`,
                     background: "rgba(255,255,255,0.03)",
                   }}
                 >
                   <span
                     className="relative z-10 font-semibold text-xs flex items-center gap-2"
-                    style={{ color: config.accentColor || "#ffffff" }}
+                    style={{ color: config?.accentColor || "#ffffff" }}
                   >
                     <link.icon size={13} />
                     <span>{link.title}</span>
@@ -323,7 +326,7 @@ export function LiveProfilePreview({
             </div>
 
             {/* Mock Guestbook Section */}
-            {config.enableGuestbook && (
+            {config?.enableGuestbook && (
               <div className="w-full max-w-[260px] bg-zinc-950/40 border border-white/5 rounded-xl p-3 mt-4 text-left backdrop-blur-md">
                 <div className="flex items-center gap-1.5 text-white/40 mb-2">
                   <MessageSquare size={10} />
@@ -337,7 +340,7 @@ export function LiveProfilePreview({
             )}
 
             {/* Mock Ratings Section */}
-            {config.enableRating && (
+            {config?.enableRating && (
               <div className="w-full max-w-[260px] bg-zinc-950/40 border border-white/5 rounded-xl p-2.5 mt-4 flex items-center justify-between backdrop-blur-md">
                 <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider">Avalie meu perfil</span>
                 <div className="flex gap-0.5 text-yellow-400">
@@ -354,14 +357,14 @@ export function LiveProfilePreview({
             <div
               className={cn(
                 "absolute z-30 p-2 border backdrop-blur-lg flex items-center gap-2",
-                config.playerPosition === "bottom-left"
+                config?.playerPosition === "bottom-left"
                   ? "bottom-4 left-4 rounded-xl"
-                  : config.playerPosition === "top-right"
+                  : config?.playerPosition === "top-right"
                   ? "top-14 right-4 rounded-xl"
                   : "bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4"
               )}
               style={{
-                borderRadius: config.playerPosition === "bottom-center" ? "9999px" : "12px",
+                borderRadius: config?.playerPosition === "bottom-center" ? "9999px" : "12px",
                 background: "rgba(0,0,0,0.7)",
                 borderColor: "rgba(255,255,255,0.1)",
               }}
@@ -370,7 +373,7 @@ export function LiveProfilePreview({
                 <Play size={10} fill="currentColor" />
               </div>
               <span className="text-[9px] font-semibold text-white/80 whitespace-nowrap">
-                {config.loadingText || "Play Music"}
+                {config?.loadingText || "Play Music"}
               </span>
             </div>
           )}

@@ -12,9 +12,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-};
+  // Cast to avoid strict lint config type errors on newer Next.js version typings
+} as any;
 
 export default nextConfig;

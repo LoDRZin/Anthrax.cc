@@ -17,6 +17,8 @@ import ConfettiWrapper from "@/components/public/ConfettiWrapper";
 import StaggerContainer from "@/components/public/StaggerContainer";
 import EasterEggsEngine from "@/components/public/EasterEggsEngine";
 import CustomContextMenu from "@/components/public/CustomContextMenu";
+import { MagicCard } from "@/components/magicui/magic-card";
+import { TextReveal } from "@/components/magicui/text-reveal";
 import ProfileActions from "@/components/public/ProfileActions";
 import { DynamicWidget } from "@/components/widgets/DynamicWidget";
 import CursorFollower from "@/components/public/CursorFollower";
@@ -184,7 +186,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             if (hour >= 18 || hour < 5) greeting = "Boa noite";
             return <span className="block text-sm text-white/50 mb-1 font-normal tracking-wider uppercase" style={{ WebkitTextFillColor: "initial", color: "inherit" }}>{greeting},</span>;
           })()}
-          {profile.displayName || profile.username}
+          <TextReveal text={profile.displayName || profile.username} />
         </h1>
         {profile.bio && (
           <div className="text-white/80 mb-6 max-w-sm drop-shadow-sm font-medium" style={{ textAlign: uiConfig.textAlign || "center" }}>
@@ -222,17 +224,17 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             return (
               <MagneticButton key={link.id} href={link.url} className={uiConfig.layout === "grid" ? "w-[47%]" : "w-full"}>
                 <ConfettiWrapper enabled={!!uiConfig.confettiEnabled} className="w-full">
-                  <div 
+                  <MagicCard
                     className={`group relative w-full overflow-hidden p-4 flex items-center justify-center transition-all duration-300 backdrop-blur-md ${
                       uiConfig.linkHoverEffect === "shake" ? "hover:animate-pulse" : ""
                     }`}
+                    gradientColor={uiConfig.glowColor || "rgba(255,255,255,0.5)"}
+                    glassColor="rgba(255,255,255,0.05)"
                     style={{ 
                       borderRadius: 'var(--border-radius)', 
                       boxShadow: '0 4px 20px var(--glow-color)',
                       backdropFilter: 'blur(var(--glass-intensity))',
                       WebkitBackdropFilter: 'blur(var(--glass-intensity))',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)'
                     }}
                   >
                     <div className={`absolute inset-0 bg-white/5 transition-all duration-300 ${hoverClass}`} />
@@ -247,7 +249,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                       {link.icon === "ShoppingBag" && <ShoppingBag size={20} />}
                       {link.title}
                     </span>
-                  </div>
+                  </MagicCard>
                 </ConfettiWrapper>
               </MagneticButton>
             );

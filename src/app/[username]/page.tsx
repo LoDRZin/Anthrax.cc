@@ -20,6 +20,10 @@ import CustomContextMenu from "@/components/public/CustomContextMenu";
 import ProfileActions from "@/components/public/ProfileActions";
 import { DynamicWidget } from "@/components/widgets/DynamicWidget";
 import CursorFollower from "@/components/public/CursorFollower";
+import Guestbook from "@/components/public/Guestbook";
+import ProfileRating from "@/components/public/ProfileRating";
+import FocusModeToggle from "@/components/public/FocusModeToggle";
+import VisitorThemeToggle from "@/components/public/VisitorThemeToggle";
 import VideoBackground from "@/components/public/VideoBackground";
 import NoiseOverlay from "@/components/public/NoiseOverlay";
 import { headers } from "next/headers";
@@ -49,7 +53,9 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     where: { username: p.username },
     include: { 
       links: { orderBy: { order: "asc" } },
-      widgets: { where: { active: true }, orderBy: { order: "asc" } }
+      widgets: { where: { active: true }, orderBy: { order: "asc" } },
+      guestbook: { orderBy: { createdAt: "desc" } },
+      ratings: true
     }
   });
 
@@ -112,6 +118,8 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       <EasterEggsEngine />
       <CustomContextMenu profileUrl={`https://anthrax.cc/${profile.username}`} />
       <ProfileActions profileUrl={`https://anthrax.cc/${profile.username}`} />
+      {uiConfig.enableFocusMode && <FocusModeToggle />}
+      {uiConfig.enableVisitorThemes && <VisitorThemeToggle />}
 
       {profile.backgroundType === "webgl" ? (
         <ClientWebGL scene={profile.webglScene || "synthwave"} />
@@ -155,7 +163,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
         {/* Info */}
         <h1 
-          className="text-3xl font-bold mb-2 tracking-tight drop-shadow-md text-center"
+          className="text-3xl font-bold mb-2 tracking-tight drop-shadow-md text-center relative"
           style={uiConfig.textGradient ? {
             backgroundImage: uiConfig.textGradient,
             WebkitBackgroundClip: "text",
@@ -164,6 +172,11 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             color: "transparent"
           } : {}}
         >
+          {uiConfig.manualStatus && (
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white/10 text-white backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium border border-white/10">
+              {uiConfig.manualStatus}
+            </div>
+          )}
           {(() => {
             const hour = new Date().getHours();
             let greeting = "Bom dia";
@@ -243,10 +256,33 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
         {/* Widgets Dinâmicos */}
         {profile.widgets && profile.widgets.length > 0 && (
-          <div className="w-full mt-6 space-y-4">
+          <div className="w-full mt-6 space-y-4 focus-mode-hide">
             {profile.widgets.map((widget) => (
               <DynamicWidget key={widget.id} widget={widget} />
             ))}
+          </div>
+        )}
+
+        {/* Guestbook */}
+        {uiConfig.enableGuestbook && (
+          <div className="w-full focus-mode-hide">
+            <Guestbook profileId={profile.id} entries={profile.guestbook} />
+          </div>
+        )}
+
+        {/* Avaliação */}
+        {uiConfig.enableRating && (
+          <div className="w-full focus-mode-hide">
+            <ProfileRating 
+              profileId={profile.id} 
+              totalRatings={profile.ratings.length}
+              initialRating={
+                profile.ratings.length > 0 
+                  ? Math.round(profile.ratings.reduce((a: any, b: any) => a + b.rating, 0) / profile.ratings.length) 
+                  : 0
+              }
+              hasRated={profile.ratings.some((r: any) => r.ipHash === ipHash)}
+            />
           </div>
         )}
 

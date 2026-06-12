@@ -27,7 +27,7 @@ export default async function LinksPage() {
     if (!type || !inputData) return;
 
     let configObj: any = {};
-    if (["spotify", "soundcloud", "youtube", "html"].includes(type)) {
+    if (["spotify", "soundcloud", "youtube", "html", "notion"].includes(type)) {
       configObj = type === "html" ? { html: inputData } : { url: inputData };
     } else if (["github", "twitch"].includes(type)) {
       configObj = { username: inputData };
@@ -98,6 +98,7 @@ export default async function LinksPage() {
               <optgroup label="Utilitários" className="bg-[#0a0a0a]">
                 <option value="crypto">Cripto Ticker (Qualquer valor)</option>
                 <option value="countdown">Contagem (Data ISO ex: 2026-12-31)</option>
+                <option value="notion">Notion Page (URL pública)</option>
               </optgroup>
             </select>
             <Input name="inputData" placeholder="Depende do Widget (Username, URL, Data ou Código HTML)" className="flex-1 bg-black/50 border-white/10" required />

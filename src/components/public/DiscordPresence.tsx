@@ -7,7 +7,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function DiscordPresence({ discordId }: { discordId: string }) {
   const { data, error } = useSWR(`https://api.lanyard.rest/v1/users/${discordId}`, fetcher, {
-    refreshInterval: 10000,
+    revalidateOnFocus: false,
+    revalidateIfStale: false,
   });
 
 

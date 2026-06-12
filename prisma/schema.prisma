@@ -36,6 +36,8 @@ model Profile {
   links          Link[]
   pageViews      PageView[]
   widgets        Widget[]
+  guestbook      GuestbookEntry[]
+  ratings        ProfileRating[]
 }
 
 model Widget {
@@ -50,12 +52,33 @@ model Widget {
 }
 
 model Link {
+  id         String   @id @default(cuid())
+  profileId  String
+  title      String
+  url        String
+  targetDate String?
+  icon       String?
+  order      Int      @default(0)
+
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model GuestbookEntry {
   id        String   @id @default(cuid())
   profileId String
-  title     String
-  url       String
-  icon      String?
-  order     Int      @default(0)
+  name      String
+  message   String
+  createdAt DateTime @default(now())
+
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model ProfileRating {
+  id        String   @id @default(cuid())
+  profileId String
+  ipHash    String   
+  rating    Int
+  createdAt DateTime @default(now())
 
   profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }

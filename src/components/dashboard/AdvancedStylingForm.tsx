@@ -50,7 +50,13 @@ export default function AdvancedStylingForm({ uiConfigStr }: { uiConfigStr: stri
       textGradient: "",
       rotatingBio: false,
       rotatingWords: "Designer, Developer, Creator",
-      monoFont: false
+      monoFont: false,
+      // Part 7
+      enableGuestbook: false,
+      enableRating: false,
+      enableVisitorThemes: false,
+      enableFocusMode: false,
+      manualStatus: ""
     };
   });
 
@@ -500,6 +506,61 @@ export default function AdvancedStylingForm({ uiConfigStr }: { uiConfigStr: stri
               <p className="text-xs text-white/50">Coloque um par de chaves {'{}'} na sua Bio real onde as palavras devem aparecer!</p>
             </div>
           )}
+
+        </div>
+      </div>
+
+      {/* --- SESSÃO EXPERIMENTAL (PARTE 7) --- */}
+      <div className="col-span-1 sm:col-span-2 pt-6 border-t border-white/10 mt-2">
+        <h3 className="text-lg font-bold mb-4">🚀 Experimental (Parte 7)</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+          {/* Manual Status */}
+          <div className="space-y-3 sm:col-span-2">
+            <Label>Status Manual (Aparece no topo do perfil)</Label>
+            <Input 
+              value={config.manualStatus || ""} 
+              onChange={(e) => updateField("manualStatus", e.target.value)}
+              className="bg-black/50 border-white/10"
+              placeholder="ex: 🌙 Dormindo, 💻 Codando, 🎮 Jogando Valorant"
+            />
+          </div>
+
+          {/* Guestbook Toggle */}
+          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div>
+              <Label className="font-semibold">Mural de Recados (Guestbook)</Label>
+              <p className="text-xs text-white/60">Permitir que visitantes deixem mensagens.</p>
+            </div>
+            <Switch checked={!!config.enableGuestbook} onCheckedChange={(val) => updateField("enableGuestbook", val)} />
+          </div>
+
+          {/* Rating Toggle */}
+          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div>
+              <Label className="font-semibold">Sistema de Avaliação</Label>
+              <p className="text-xs text-white/60">Visitantes podem avaliar com 5 estrelas.</p>
+            </div>
+            <Switch checked={!!config.enableRating} onCheckedChange={(val) => updateField("enableRating", val)} />
+          </div>
+
+          {/* Visitor Themes Toggle */}
+          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div>
+              <Label className="font-semibold">Temas do Visitante</Label>
+              <p className="text-xs text-white/60">Mostra o botão Sol/Lua para inverter as cores do site.</p>
+            </div>
+            <Switch checked={!!config.enableVisitorThemes} onCheckedChange={(val) => updateField("enableVisitorThemes", val)} />
+          </div>
+
+          {/* Focus Mode Toggle */}
+          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div>
+              <Label className="font-semibold">Modo Foco (Zen)</Label>
+              <p className="text-xs text-white/60">Permitir aos visitantes esconder animações e widgets.</p>
+            </div>
+            <Switch checked={!!config.enableFocusMode} onCheckedChange={(val) => updateField("enableFocusMode", val)} />
+          </div>
 
         </div>
       </div>

@@ -11,6 +11,7 @@ const TwitchWidget = dynamic(() => import("./TwitchWidget"), { ssr: false });
 const CryptoTickerWidget = dynamic(() => import("./CryptoTickerWidget"), { ssr: false });
 const CountdownWidget = dynamic(() => import("./CountdownWidget"), { ssr: false });
 const HtmlWidget = dynamic(() => import("./HtmlWidget"), { ssr: false });
+const NotionWidget = dynamic(() => import("./NotionWidget"), { ssr: false });
 
 export function DynamicWidget({ widget }: { widget: any }) {
   let configObj = {};
@@ -46,6 +47,9 @@ export function DynamicWidget({ widget }: { widget: any }) {
   }
   if (widget.type === "html") {
     return <HtmlWidget config={configObj} />;
+  }
+  if (widget.type === "notion") {
+    return <NotionWidget config={configObj} />;
   }
 
   return null;

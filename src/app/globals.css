@@ -128,3 +128,31 @@
     @apply font-sans;
   }
 }
+
+/* Custom Scrollbar for Guestbook */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Focus Mode */
+body.focus-mode canvas,
+body.focus-mode video,
+body.focus-mode .focus-mode-hide,
+body.focus-mode .tsparticles-canvas-el {
+  display: none !important;
+}
+body.focus-mode {
+  background: #000 !important;
+  background-image: none !important;
+}

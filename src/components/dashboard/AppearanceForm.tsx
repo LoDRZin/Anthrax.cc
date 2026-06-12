@@ -21,6 +21,29 @@ export default function AppearanceForm({ profile }: { profile: ProfileAppearance
   const [audioUrl, setAudioUrl] = useState(profile.audioUrl || "");
   const [effect, setEffect] = useState(profile.effect || "none");
   const [isSaving, setIsSaving] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+
+  const handleGenerateAiAvatar = () => {
+    if (!aiPrompt) return;
+    setIsGeneratingAi(true);
+    // Pollinations AI URL (free, no key needed)
+    const encodedPrompt = encodeURIComponent(aiPrompt);
+    const randomSeed = Math.floor(Math.random() * 1000000);
+    const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true&seed=${randomSeed}`;
+    
+    // Test the image load
+    const img = new globalThis.Image();
+    img.src = url;
+    img.onload = () => {
+      setAvatarUrl(url);
+      setIsGeneratingAi(false);
+    };
+    img.onerror = () => {
+      setIsGeneratingAi(false);
+      alert("Erro ao gerar imagem.");
+    };
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,6 +94,23 @@ export default function AppearanceForm({ profile }: { profile: ProfileAppearance
               button: "Upload Avatar"
             }}
           />
+        </div>
+
+        {/* IA Avatar Generation */}
+        <div className="mt-4 p-4 border border-white/10 rounded-xl bg-white/5 space-y-3">
+          <Label>Ou gere um com Inteligência Artificial 🪄</Label>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Input 
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="ex: cyberpunk hacker neon cat, 8k resolution" 
+              className="bg-black/50 border-white/10 flex-1" 
+            />
+            <Button type="button" variant="secondary" onClick={handleGenerateAiAvatar} disabled={isGeneratingAi || !aiPrompt}>
+              {isGeneratingAi ? "Gerando..." : "Gerar Avatar"}
+            </Button>
+          </div>
+          <p className="text-xs text-white/50">Imagens geradas instantaneamente via Pollinations.ai</p>
         </div>
       </div>
 

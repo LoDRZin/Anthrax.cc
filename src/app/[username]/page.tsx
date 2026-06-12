@@ -290,7 +290,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         {/* Guestbook */}
         {uiConfig.enableGuestbook && (
           <div className="w-full focus-mode-hide">
-            <Guestbook profileId={profile.id} entries={profile.guestbook} />
+            <Guestbook profileId={profile.id} entries={guestbookEntries} />
           </div>
         )}
 
@@ -299,20 +299,20 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           <div className="w-full focus-mode-hide">
             <ProfileRating 
               profileId={profile.id} 
-              totalRatings={profile.ratings.length}
+              totalRatings={ratingsEntries.length}
               initialRating={
-                profile.ratings.length > 0 
-                  ? Math.round(profile.ratings.reduce((a: any, b: any) => a + b.rating, 0) / profile.ratings.length) 
+                ratingsEntries.length > 0 
+                  ? Math.round(ratingsEntries.reduce((a: any, b: any) => a + b.rating, 0) / ratingsEntries.length) 
                   : 0
               }
-              hasRated={profile.ratings.some((r: any) => r.ipHash === ipHash)}
+              hasRated={ratingsEntries.some((r: any) => r.ipHash === ipHash)}
             />
           </div>
         )}
 
         {/* Views & Marca D'água */}
         <div className="mt-16 mb-4 flex flex-col items-center gap-2">
-          <p className="text-white/30 text-xs font-mono">{updatedProfile?.views ?? profile.views} views</p>
+          <p className="text-white/30 text-xs font-mono">{viewCount} views</p>
           <Link href="/" className="text-white/40 hover:text-white/80 transition-colors text-sm font-bold tracking-widest uppercase">
             Anthrax<span className="text-primary">.cc</span>
           </Link>

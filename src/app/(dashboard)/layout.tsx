@@ -37,7 +37,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <ClerkProvider localization={ptBR}>
+    <ClerkProvider localization={ptBR} publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       <div className="flex h-screen w-full bg-[#030303] text-white relative font-sans overflow-hidden">
         {/* Background Noise overlay */}
         <div 

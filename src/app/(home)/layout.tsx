@@ -7,7 +7,7 @@ export default function HomeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider localization={ptBR}>
+    <ClerkProvider localization={ptBR} publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       {children}
     </ClerkProvider>
   );

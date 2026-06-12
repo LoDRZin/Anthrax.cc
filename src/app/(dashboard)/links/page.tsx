@@ -14,8 +14,9 @@ export default async function LinksPage() {
     "use server";
     const title = formData.get("title") as string;
     const url = formData.get("url") as string;
+    const icon = formData.get("icon") as string;
     if (!title || !url) return;
-    await createLink({ title, url });
+    await createLink({ title, url, icon: icon !== "none" ? icon : undefined });
     revalidatePath("/links");
   }
 
@@ -54,6 +55,18 @@ export default async function LinksPage() {
         </CardHeader>
         <CardContent>
           <form action={addLink} className="flex flex-col sm:flex-row gap-4">
+            <div className="flex w-full sm:w-[150px]">
+              <select name="icon" className="flex h-9 w-full rounded-md border border-white/10 bg-black/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-white">
+                <option value="none">Ícone...</option>
+                <option value="Instagram">Instagram</option>
+                <option value="Twitter">Twitter</option>
+                <option value="Github">GitHub</option>
+                <option value="Youtube">YouTube</option>
+                <option value="Globe">Site</option>
+                <option value="Mail">Email</option>
+                <option value="ShoppingBag">Loja</option>
+              </select>
+            </div>
             <Input name="title" placeholder="Título (ex: Meu Discord)" className="flex-1 bg-black/50 border-white/10" required />
             <Input name="url" type="url" placeholder="https://..." className="flex-1 bg-black/50 border-white/10" required />
             <Button type="submit">

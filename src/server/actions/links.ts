@@ -16,7 +16,7 @@ export async function getLinks() {
   return profile?.links || [];
 }
 
-export async function createLink(data: { title: string; url: string }) {
+export async function createLink(data: { title: string; url: string; icon?: string }) {
   const { userId } = await auth();
   if (!userId) throw new Error("Não autenticado");
 
@@ -36,6 +36,7 @@ export async function createLink(data: { title: string; url: string }) {
       profileId: profile.id,
       title: data.title,
       url: data.url,
+      icon: data.icon,
       order: newOrder,
     },
   });

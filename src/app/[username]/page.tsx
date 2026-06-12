@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
+import { Globe, Mail, ShoppingBag } from "lucide-react";
+import { FaInstagram, FaTwitter, FaGithub, FaYoutube } from "react-icons/fa";
 import dynamic from "next/dynamic";
 import AudioGatekeeper from "@/components/public/AudioGatekeeper";
 import BackgroundParticles from "@/components/public/BackgroundParticles";
@@ -10,6 +12,7 @@ import DiscordPresence from "@/components/public/DiscordPresence";
 import MagneticButton from "@/components/public/MagneticButton";
 import TiltCard from "@/components/public/TiltCard";
 import TypewriterText from "@/components/public/TypewriterText";
+import RotatingBio from "@/components/public/RotatingBio";
 import ConfettiWrapper from "@/components/public/ConfettiWrapper";
 import StaggerContainer from "@/components/public/StaggerContainer";
 import EasterEggsEngine from "@/components/public/EasterEggsEngine";
@@ -83,16 +86,26 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     if (profile.uiConfig) uiConfig = JSON.parse(profile.uiConfig);
   } catch (e) {}
 
+  const fontName = uiConfig.fontFamily || 'Inter';
+  const fontUrl = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}:wght@300;400;500;600;700&display=swap`;
+
   return (
     <div 
-      className="min-h-screen bg-[#0a0a0a] text-white relative flex justify-center items-center overflow-hidden"
+      className={`min-h-screen bg-[#0a0a0a] text-white relative flex justify-center items-center overflow-hidden ${uiConfig.monoFont ? 'font-mono' : ''}`}
       style={{
         '--accent-color': uiConfig.accentColor || '#ffffff',
         '--border-radius': uiConfig.borderRadius || '12px',
         '--glass-intensity': uiConfig.glassIntensity || '10px',
-        '--glow-color': uiConfig.glowColor || 'rgba(255,255,255,0.1)'
+        '--glow-color': uiConfig.glowColor || 'rgba(255,255,255,0.1)',
+        fontFamily: uiConfig.monoFont ? undefined : `'${fontName}', sans-serif`,
+        textShadow: uiConfig.textShadow || undefined,
+        letterSpacing: uiConfig.letterSpacing !== "normal" ? uiConfig.letterSpacing : undefined,
+        lineHeight: uiConfig.lineHeight || undefined,
+        textAlign: uiConfig.textAlign || 'center',
+        textTransform: uiConfig.textTransform !== "none" ? uiConfig.textTransform : undefined
       } as React.CSSProperties}
     >
+      <link rel="stylesheet" href={fontUrl} />
       {uiConfig.customCss && <style dangerouslySetInnerHTML={{ __html: uiConfig.customCss }} />}
       {uiConfig.noiseOverlay && <NoiseOverlay />}
       <CursorFollower cursorStyle={uiConfig.cursorStyle || "default"} />
@@ -141,22 +154,36 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         </TiltCard>
 
         {/* Info */}
-        <h1 className="text-3xl font-bold mb-2 tracking-tight drop-shadow-md text-center">
+        <h1 
+          className="text-3xl font-bold mb-2 tracking-tight drop-shadow-md text-center"
+          style={uiConfig.textGradient ? {
+            backgroundImage: uiConfig.textGradient,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            color: "transparent"
+          } : {}}
+        >
           {(() => {
             const hour = new Date().getHours();
             let greeting = "Bom dia";
             if (hour >= 12 && hour < 18) greeting = "Boa tarde";
             if (hour >= 18 || hour < 5) greeting = "Boa noite";
-            return <span className="block text-sm text-white/50 mb-1 font-normal tracking-wider uppercase">{greeting},</span>;
+            return <span className="block text-sm text-white/50 mb-1 font-normal tracking-wider uppercase" style={{ WebkitTextFillColor: "initial", color: "inherit" }}>{greeting},</span>;
           })()}
           {profile.displayName || profile.username}
         </h1>
         {profile.bio && (
-          <TypewriterText 
-            text={profile.bio} 
-            enabled={!!uiConfig.typewriterBio}
-            className="text-white/80 text-center mb-6 max-w-sm drop-shadow-sm font-medium" 
-          />
+          <div className="text-white/80 mb-6 max-w-sm drop-shadow-sm font-medium" style={{ textAlign: uiConfig.textAlign || "center" }}>
+            {uiConfig.rotatingBio ? (
+              <RotatingBio bio={profile.bio} words={uiConfig.rotatingWords || ""} />
+            ) : (
+              <TypewriterText 
+                text={profile.bio} 
+                enabled={!!uiConfig.typewriterBio}
+              />
+            )}
+          </div>
         )}
 
         {/* Discord Lanyard */}
@@ -197,7 +224,16 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                   >
                     <div className={`absolute inset-0 bg-white/5 transition-all duration-300 ${hoverClass}`} />
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                    <span className="relative z-10 font-semibold text-lg drop-shadow-md" style={{ color: 'var(--accent-color)' }}>{link.title}</span>
+                    <span className="relative z-10 font-semibold text-lg drop-shadow-md flex items-center gap-3" style={{ color: 'var(--accent-color)' }}>
+                      {link.icon === "Instagram" && <FaInstagram size={20} />}
+                      {link.icon === "Twitter" && <FaTwitter size={20} />}
+                      {link.icon === "Github" && <FaGithub size={20} />}
+                      {link.icon === "Youtube" && <FaYoutube size={20} />}
+                      {link.icon === "Globe" && <Globe size={20} />}
+                      {link.icon === "Mail" && <Mail size={20} />}
+                      {link.icon === "ShoppingBag" && <ShoppingBag size={20} />}
+                      {link.title}
+                    </span>
                   </div>
                 </ConfettiWrapper>
               </MagneticButton>

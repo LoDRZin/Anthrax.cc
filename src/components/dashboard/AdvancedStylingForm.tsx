@@ -39,7 +39,18 @@ export default function AdvancedStylingForm({ uiConfigStr }: { uiConfigStr: stri
       linkHoverEffect: "default",
       particleInteraction: false,
       staggeredEntry: false,
-      confettiEnabled: true
+      confettiEnabled: true,
+      // Part 6
+      fontFamily: "Inter",
+      textShadow: "",
+      letterSpacing: "normal",
+      lineHeight: "1.5",
+      textAlign: "center",
+      textTransform: "none",
+      textGradient: "",
+      rotatingBio: false,
+      rotatingWords: "Designer, Developer, Creator",
+      monoFont: false
     };
   });
 
@@ -360,7 +371,140 @@ export default function AdvancedStylingForm({ uiConfigStr }: { uiConfigStr: stri
 
       </div>
 
-      <Button type="submit" className="w-full sm:w-auto" disabled={isSaving}>
+      {/* --- SESSÃO DE TIPOGRAFIA E TEXTO (PARTE 6) --- */}
+      <div className="col-span-1 sm:col-span-2 pt-6 border-t border-white/10 mt-2">
+        <h3 className="text-lg font-bold mb-4">🔤 Tipografia e Texto (Parte 6)</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          
+          {/* Font Family */}
+          <div className="space-y-3">
+            <Label>Fonte Principal (Google Fonts)</Label>
+            <Select value={config.fontFamily || "Inter"} onValueChange={(val) => updateField("fontFamily", val)}>
+              <SelectTrigger className="bg-black/50 border-white/10">
+                <SelectValue placeholder="Selecione a fonte" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Inter">Inter (Padrão)</SelectItem>
+                <SelectItem value="Roboto">Roboto</SelectItem>
+                <SelectItem value="Playfair Display">Playfair Display (Elegante)</SelectItem>
+                <SelectItem value="Outfit">Outfit (Moderna)</SelectItem>
+                <SelectItem value="Fira Code">Fira Code (Dev)</SelectItem>
+                <SelectItem value="Space Grotesk">Space Grotesk</SelectItem>
+                <SelectItem value="Syne">Syne (Arrojada)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Text Alignment */}
+          <div className="space-y-3">
+            <Label>Alinhamento do Texto</Label>
+            <Select value={config.textAlign || "center"} onValueChange={(val) => updateField("textAlign", val)}>
+              <SelectTrigger className="bg-black/50 border-white/10">
+                <SelectValue placeholder="Alinhamento" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="left">Esquerda</SelectItem>
+                <SelectItem value="center">Centro</SelectItem>
+                <SelectItem value="right">Direita</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Letter Spacing */}
+          <div className="space-y-3">
+            <Label>Espaçamento de Letras (Tracking)</Label>
+            <Input 
+              value={config.letterSpacing || "normal"} 
+              onChange={(e) => updateField("letterSpacing", e.target.value)}
+              className="bg-black/50 border-white/10"
+              placeholder="ex: normal, 1px, 0.1em"
+            />
+          </div>
+
+          {/* Line Height */}
+          <div className="space-y-3">
+            <Label>Altura da Linha (Line-height)</Label>
+            <Input 
+              value={config.lineHeight || "1.5"} 
+              onChange={(e) => updateField("lineHeight", e.target.value)}
+              className="bg-black/50 border-white/10"
+              placeholder="ex: 1.5, 2, 150%"
+            />
+          </div>
+
+          {/* Text Transform */}
+          <div className="space-y-3">
+            <Label>Caixa do Texto</Label>
+            <Select value={config.textTransform || "none"} onValueChange={(val) => updateField("textTransform", val)}>
+              <SelectTrigger className="bg-black/50 border-white/10">
+                <SelectValue placeholder="Caixa do texto" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Padrão</SelectItem>
+                <SelectItem value="uppercase">TUDO MAIÚSCULO</SelectItem>
+                <SelectItem value="lowercase">tudo minúsculo</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Text Gradient */}
+          <div className="space-y-3">
+            <Label>Gradiente no Nome (Opcional)</Label>
+            <Input 
+              value={config.textGradient || ""} 
+              onChange={(e) => updateField("textGradient", e.target.value)}
+              className="bg-black/50 border-white/10"
+              placeholder="ex: linear-gradient(to right, #ff0000, #00ff00)"
+            />
+          </div>
+
+          {/* Text Shadow */}
+          <div className="space-y-3 sm:col-span-2">
+            <Label>Sombra/Brilho no Texto (Text Shadow)</Label>
+            <Input 
+              value={config.textShadow || ""} 
+              onChange={(e) => updateField("textShadow", e.target.value)}
+              className="bg-black/50 border-white/10"
+              placeholder="ex: 0 0 10px rgba(255,255,255,0.5)"
+            />
+          </div>
+
+          {/* Mono Font Toggle */}
+          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div>
+              <Label className="font-semibold">Forçar Fonte Monoespaçada</Label>
+              <p className="text-xs text-white/60">Aplica estilo de código em tudo.</p>
+            </div>
+            <Switch checked={!!config.monoFont} onCheckedChange={(val) => updateField("monoFont", val)} />
+          </div>
+
+          {/* Rotating Bio Toggle */}
+          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div>
+              <Label className="font-semibold">Bio com Palavras Rotativas</Label>
+              <p className="text-xs text-white/60">Gira palavras pré-definidas na sua bio.</p>
+            </div>
+            <Switch checked={!!config.rotatingBio} onCheckedChange={(val) => updateField("rotatingBio", val)} />
+          </div>
+
+          {/* Rotating Words List */}
+          {config.rotatingBio && (
+            <div className="space-y-3 sm:col-span-2">
+              <Label>Palavras Rotativas (separadas por vírgula)</Label>
+              <Input 
+                value={config.rotatingWords || ""} 
+                onChange={(e) => updateField("rotatingWords", e.target.value)}
+                className="bg-black/50 border-white/10"
+                placeholder="ex: Designer, Developer, Creator"
+              />
+              <p className="text-xs text-white/50">Coloque um par de chaves {'{}'} na sua Bio real onde as palavras devem aparecer!</p>
+            </div>
+          )}
+
+        </div>
+      </div>
+
+      <Button type="submit" className="w-full sm:w-auto mt-6" disabled={isSaving}>
         {isSaving ? "Salvando..." : "Salvar Estilos Avançados"}
       </Button>
     </form>

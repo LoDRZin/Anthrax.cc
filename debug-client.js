@@ -13,7 +13,7 @@ const puppeteer = require('puppeteer');
     }
   });
 
-  await page.goto('http://localhost:3000/LoDRZin', { waitUntil: 'networkidle0' });
+  await page.goto('http://localhost:3000/appearance', { waitUntil: 'networkidle0' });
   
   await browser.close();
 })();

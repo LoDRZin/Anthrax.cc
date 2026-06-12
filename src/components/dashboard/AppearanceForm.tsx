@@ -99,6 +99,27 @@ export default function AppearanceForm({ profile }: { profile: ProfileData }) {
     });
   }, [profile, store]);
 
+  // Sync tab with URL hash (e.g. /appearance#effects)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === "#effects") {
+        setActiveTab("effects");
+      } else if (hash === "#styling") {
+        setActiveTab("styling");
+      } else if (hash === "#media") {
+        setActiveTab("media");
+      } else if (hash === "#extras") {
+        setActiveTab("extras");
+      }
+    };
+
+    handleHashChange();
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
   // Read state from Zustand store
   const avatarUrl = store.isInitialized ? store.avatarUrl : profile.avatarUrl;
   const backgroundUrl = store.isInitialized ? store.backgroundUrl : profile.backgroundUrl;

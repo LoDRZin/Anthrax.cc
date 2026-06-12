@@ -12,6 +12,9 @@ import TiltCard from "@/components/public/TiltCard";
 import TypewriterText from "@/components/public/TypewriterText";
 import ConfettiWrapper from "@/components/public/ConfettiWrapper";
 import StaggerContainer from "@/components/public/StaggerContainer";
+import EasterEggsEngine from "@/components/public/EasterEggsEngine";
+import CustomContextMenu from "@/components/public/CustomContextMenu";
+import ProfileActions from "@/components/public/ProfileActions";
 import { DynamicWidget } from "@/components/widgets/DynamicWidget";
 import CursorFollower from "@/components/public/CursorFollower";
 import VideoBackground from "@/components/public/VideoBackground";
@@ -93,6 +96,9 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       {uiConfig.customCss && <style dangerouslySetInnerHTML={{ __html: uiConfig.customCss }} />}
       {uiConfig.noiseOverlay && <NoiseOverlay />}
       <CursorFollower cursorStyle={uiConfig.cursorStyle || "default"} />
+      <EasterEggsEngine />
+      <CustomContextMenu profileUrl={`https://anthrax.cc/${profile.username}`} />
+      <ProfileActions profileUrl={`https://anthrax.cc/${profile.username}`} />
 
       {profile.backgroundType === "webgl" ? (
         <ClientWebGL scene={profile.webglScene || "synthwave"} />
@@ -136,6 +142,13 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
         {/* Info */}
         <h1 className="text-3xl font-bold mb-2 tracking-tight drop-shadow-md text-center">
+          {(() => {
+            const hour = new Date().getHours();
+            let greeting = "Bom dia";
+            if (hour >= 12 && hour < 18) greeting = "Boa tarde";
+            if (hour >= 18 || hour < 5) greeting = "Boa noite";
+            return <span className="block text-sm text-white/50 mb-1 font-normal tracking-wider uppercase">{greeting},</span>;
+          })()}
           {profile.displayName || profile.username}
         </h1>
         {profile.bio && (

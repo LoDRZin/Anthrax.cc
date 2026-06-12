@@ -23,5 +23,27 @@ export async function createMusicWidget(type: "spotify" | "soundcloud", url: str
 
   revalidatePath(`/${profile.username}`);
   revalidatePath("/appearance");
+  revalidatePath("/links");
+  return { success: true };
+}
+
+export async function createWidget(type: string, configObj: any) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Não autenticado");
+
+  const profile = await prisma.profile.findUnique({ where: { userId } });
+  if (!profile) throw new Error("Perfil não encontrado");
+
+  await prisma.widget.create({
+    data: {
+      profileId: profile.id,
+      type,
+      config: JSON.stringify(configObj),
+      order: 0,
+    },
+  });
+
+  revalidatePath(`/${profile.username}`);
+  revalidatePath("/links");
   return { success: true };
 }

@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getLinks, createLink } from "@/server/actions/links";
-import { createMusicWidget } from "@/server/actions/widgets";
+import { createWidget } from "@/server/actions/widgets";
 import LinksList from "@/components/dashboard/LinksList";
 import { Plus } from "lucide-react";
 import { revalidatePath } from "next/cache";
@@ -19,12 +19,24 @@ export default async function LinksPage() {
     revalidatePath("/links");
   }
 
-  async function addWidget(formData: FormData) {
+  async function addWidgetForm(formData: FormData) {
     "use server";
-    const type = formData.get("type") as "spotify" | "soundcloud";
-    const url = formData.get("url") as string;
-    if (!type || !url) return;
-    await createMusicWidget(type, url);
+    const type = formData.get("type") as string;
+    const inputData = formData.get("inputData") as string;
+    if (!type || !inputData) return;
+
+    let configObj: any = {};
+    if (["spotify", "soundcloud", "youtube", "html"].includes(type)) {
+      configObj = type === "html" ? { html: inputData } : { url: inputData };
+    } else if (["github", "twitch"].includes(type)) {
+      configObj = { username: inputData };
+    } else if (type === "countdown") {
+      configObj = { targetDate: inputData, title: "Contagem Regressiva" };
+    } else {
+      configObj = { value: inputData };
+    }
+
+    await createWidget(type, configObj);
     revalidatePath("/links");
   }
 
@@ -54,16 +66,28 @@ export default async function LinksPage() {
 
       <Card className="bg-black/40 border-white/10 backdrop-blur-md">
         <CardHeader>
-          <CardTitle>Adicionar Widget de Música (Spotify/SoundCloud)</CardTitle>
-          <CardDescription>Cole o link direto da música ou playlist para criar um player na sua página.</CardDescription>
+          <CardTitle>Adicionar Widget Especial</CardTitle>
+          <CardDescription>Incorpore players, gráficos e módulos interativos na sua página.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={addWidget} className="flex flex-col sm:flex-row gap-4">
-            <select name="type" className="flex h-9 w-full sm:w-[150px] rounded-md border border-white/10 bg-black/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-white">
-              <option value="spotify" className="bg-[#0a0a0a]">Spotify</option>
-              <option value="soundcloud" className="bg-[#0a0a0a]">SoundCloud</option>
+          <form action={addWidgetForm} className="flex flex-col sm:flex-row gap-4">
+            <select name="type" className="flex h-9 w-full sm:w-[200px] rounded-md border border-white/10 bg-black/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-white">
+              <optgroup label="Música & Vídeo" className="bg-[#0a0a0a]">
+                <option value="spotify">Spotify (URL)</option>
+                <option value="soundcloud">SoundCloud (URL)</option>
+                <option value="youtube">YouTube (URL)</option>
+                <option value="twitch">Twitch (Username)</option>
+              </optgroup>
+              <optgroup label="Desenvolvedor" className="bg-[#0a0a0a]">
+                <option value="github">GitHub Chart (Username)</option>
+                <option value="html">Custom HTML (Code)</option>
+              </optgroup>
+              <optgroup label="Utilitários" className="bg-[#0a0a0a]">
+                <option value="crypto">Cripto Ticker (Qualquer valor)</option>
+                <option value="countdown">Contagem (Data ISO ex: 2026-12-31)</option>
+              </optgroup>
             </select>
-            <Input name="url" type="url" placeholder="URL da música (Ex: https://open.spotify.com/...)" className="flex-1 bg-black/50 border-white/10" required />
+            <Input name="inputData" placeholder="Depende do Widget (Username, URL, Data ou Código HTML)" className="flex-1 bg-black/50 border-white/10" required />
             <Button type="submit" variant="secondary">
               <Plus className="h-4 w-4 mr-2" />
               Adicionar Widget

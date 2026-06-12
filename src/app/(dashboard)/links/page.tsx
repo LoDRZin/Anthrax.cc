@@ -1,11 +1,12 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getLinks, createLink } from "@/server/actions/links";
 import { createWidget } from "@/server/actions/widgets";
 import LinksList from "@/components/dashboard/LinksList";
-import { Plus } from "lucide-react";
+import { Plus, Link2, LayoutGrid } from "lucide-react";
 import { revalidatePath } from "next/cache";
+import { DashboardPageTransition } from "@/components/dashboard/DashboardPageTransition";
+import { MagicCard } from "@/components/magicui/magic-card";
 
 export default async function LinksPage() {
   const links = await getLinks();
@@ -42,83 +43,115 @@ export default async function LinksPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Seus Links</h2>
-        <p className="text-muted-foreground">Gerencie e reordene os links que aparecerão no seu perfil público.</p>
+    <DashboardPageTransition className="max-w-2xl mx-auto space-y-8">
+      <div className="flex flex-col gap-1.5">
+        <h2 className="text-4xl font-extrabold tracking-tight text-white drop-shadow-md">Seus Links</h2>
+        <p className="text-white/50 text-base">Gerencie e reordene os links e widgets que aparecerão no seu perfil público.</p>
       </div>
 
-      <Card className="bg-black/40 border-white/10 backdrop-blur-md">
-        <CardHeader>
-          <CardTitle>Adicionar Novo Link</CardTitle>
-          <CardDescription>Insira a URL e um título atrativo.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form action={addLink} className="flex flex-col sm:flex-row gap-4">
-            <div className="flex w-full sm:w-[150px]">
-              <select name="icon" className="flex h-9 w-full rounded-md border border-white/10 bg-black/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-white">
-                <option value="none">Ícone...</option>
-                <option value="Instagram">Instagram</option>
-                <option value="Twitter">Twitter</option>
-                <option value="Github">GitHub</option>
-                <option value="Youtube">YouTube</option>
-                <option value="Globe">Site</option>
-                <option value="Mail">Email</option>
-                <option value="ShoppingBag">Loja</option>
+      {/* Adicionar Novo Link */}
+      <MagicCard className="bg-black/40 border border-white/5 backdrop-blur-md rounded-2xl overflow-hidden p-6" gradientColor="rgba(59, 130, 246, 0.08)">
+        <div className="flex items-center gap-2 mb-1.5 text-white">
+          <Link2 className="w-5 h-5 text-blue-400" />
+          <h3 className="text-xl font-bold">Adicionar Novo Link</h3>
+        </div>
+        <p className="text-sm text-white/50 mb-6">Insira a URL e um título atrativo.</p>
+        
+        <form action={addLink} className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="w-full sm:w-[160px] relative">
+              <select 
+                name="icon" 
+                className="flex h-11 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-1 text-sm shadow-sm transition-all focus:outline-none focus:border-blue-500/50 text-white backdrop-blur-md cursor-pointer appearance-none"
+                style={{ backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>")`, backgroundPosition: 'right 12px center', backgroundRepeat: 'no-repeat' }}
+              >
+                <option value="none" className="bg-[#0a0a0a] text-white">Ícone...</option>
+                <option value="Instagram" className="bg-[#0a0a0a] text-white">Instagram</option>
+                <option value="Twitter" className="bg-[#0a0a0a] text-white">Twitter</option>
+                <option value="Github" className="bg-[#0a0a0a] text-white">GitHub</option>
+                <option value="Youtube" className="bg-[#0a0a0a] text-white">YouTube</option>
+                <option value="Globe" className="bg-[#0a0a0a] text-white">Site</option>
+                <option value="Mail" className="bg-[#0a0a0a] text-white">Email</option>
+                <option value="ShoppingBag" className="bg-[#0a0a0a] text-white">Loja</option>
               </select>
             </div>
-            <Input name="title" placeholder="Título (ex: Meu Discord)" className="flex-1 bg-black/50 border-white/10" required />
-            <Input name="url" type="url" placeholder="https://..." className="flex-1 bg-black/50 border-white/10" required />
-            <Button type="submit">
-              <Plus className="h-4 w-4 mr-2" />
-              Adicionar Link
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+            <Input 
+              name="title" 
+              placeholder="Título (ex: Meu Discord)" 
+              className="flex-1 bg-black/40 border-white/10 hover:border-white/20 focus:border-blue-500/50 transition-all rounded-xl h-11 text-white placeholder-white/30 backdrop-blur-md" 
+              required 
+            />
+            <Input 
+              name="url" 
+              type="url" 
+              placeholder="https://..." 
+              className="flex-1 bg-black/40 border-white/10 hover:border-white/20 focus:border-blue-500/50 transition-all rounded-xl h-11 text-white placeholder-white/30 backdrop-blur-md" 
+              required 
+            />
+          </div>
+          <Button type="submit" className="w-full h-11 rounded-xl bg-white text-black hover:bg-white/90 font-bold transition-all active:scale-[0.99] cursor-pointer">
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Link
+          </Button>
+        </form>
+      </MagicCard>
 
-      <Card className="bg-black/40 border-white/10 backdrop-blur-md">
-        <CardHeader>
-          <CardTitle>Adicionar Widget Especial</CardTitle>
-          <CardDescription>Incorpore players, gráficos e módulos interativos na sua página.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form action={addWidgetForm} className="flex flex-col sm:flex-row gap-4">
-            <select name="type" className="flex h-9 w-full sm:w-[200px] rounded-md border border-white/10 bg-black/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-white">
-              <optgroup label="Música & Vídeo" className="bg-[#0a0a0a]">
-                <option value="spotify">Spotify (URL)</option>
-                <option value="soundcloud">SoundCloud (URL)</option>
-                <option value="youtube">YouTube (URL)</option>
-                <option value="twitch">Twitch (Username)</option>
-              </optgroup>
-              <optgroup label="Desenvolvedor" className="bg-[#0a0a0a]">
-                <option value="github">GitHub Chart (Username)</option>
-                <option value="html">Custom HTML (Code)</option>
-              </optgroup>
-              <optgroup label="Utilitários" className="bg-[#0a0a0a]">
-                <option value="crypto">Cripto Ticker (Qualquer valor)</option>
-                <option value="countdown">Contagem (Data ISO ex: 2026-12-31)</option>
-                <option value="notion">Notion Page (URL pública)</option>
-              </optgroup>
-            </select>
-            <Input name="inputData" placeholder="Depende do Widget (Username, URL, Data ou Código HTML)" className="flex-1 bg-black/50 border-white/10" required />
-            <Button type="submit" variant="secondary">
-              <Plus className="h-4 w-4 mr-2" />
-              Adicionar Widget
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+      {/* Adicionar Widget Especial */}
+      <MagicCard className="bg-black/40 border border-white/5 backdrop-blur-md rounded-2xl overflow-hidden p-6" gradientColor="rgba(168, 85, 247, 0.08)">
+        <div className="flex items-center gap-2 mb-1.5 text-white">
+          <LayoutGrid className="w-5 h-5 text-purple-400" />
+          <h3 className="text-xl font-bold">Adicionar Widget Especial</h3>
+        </div>
+        <p className="text-sm text-white/50 mb-6">Incorpore players, gráficos e módulos interativos na sua página.</p>
+        
+        <form action={addWidgetForm} className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="w-full sm:w-[220px] relative">
+              <select 
+                name="type" 
+                className="flex h-11 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-1 text-sm shadow-sm transition-all focus:outline-none focus:border-purple-500/50 text-white backdrop-blur-md cursor-pointer appearance-none"
+                style={{ backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>")`, backgroundPosition: 'right 12px center', backgroundRepeat: 'no-repeat' }}
+              >
+                <optgroup label="Música & Vídeo" className="bg-[#0a0a0a] text-white">
+                  <option value="spotify" className="text-white">Spotify (URL)</option>
+                  <option value="soundcloud" className="text-white">SoundCloud (URL)</option>
+                  <option value="youtube" className="text-white">YouTube (URL)</option>
+                  <option value="twitch" className="text-white">Twitch (Username)</option>
+                </optgroup>
+                <optgroup label="Desenvolvedor" className="bg-[#0a0a0a] text-white">
+                  <option value="github" className="text-white">GitHub Chart (Username)</option>
+                  <option value="html" className="text-white">Custom HTML (Code)</option>
+                </optgroup>
+                <optgroup label="Utilitários" className="bg-[#0a0a0a] text-white">
+                  <option value="crypto" className="text-white">Cripto Ticker (Qualquer valor)</option>
+                  <option value="countdown" className="text-white">Contagem (Data ISO ex: 2026-12-31)</option>
+                  <option value="notion" className="text-white">Notion Page (URL pública)</option>
+                </optgroup>
+              </select>
+            </div>
+            <Input 
+              name="inputData" 
+              placeholder="Depende do Widget (Username, URL, Data ou Código HTML)" 
+              className="flex-1 bg-black/40 border-white/10 hover:border-white/20 focus:border-purple-500/50 transition-all rounded-xl h-11 text-white placeholder-white/30 backdrop-blur-md" 
+              required 
+            />
+          </div>
+          <Button type="submit" className="w-full h-11 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold transition-all active:scale-[0.99] cursor-pointer">
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Widget
+          </Button>
+        </form>
+      </MagicCard>
 
       <div className="space-y-4">
         {links.length === 0 ? (
-          <div className="text-center p-8 border border-dashed border-white/10 rounded-xl">
-            <p className="text-muted-foreground">Você ainda não tem nenhum link.</p>
+          <div className="text-center p-8 border border-dashed border-white/10 rounded-2xl bg-black/20 backdrop-blur-sm">
+            <p className="text-white/40 text-sm">Você ainda não tem nenhum link ou widget.</p>
           </div>
         ) : (
           <LinksList initialLinks={links} />
         )}
       </div>
-    </div>
+    </DashboardPageTransition>
   );
 }

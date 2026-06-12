@@ -9,6 +9,23 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { updateAdvancedStyling } from "@/server/actions/appearance";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { Palette, Volume2, Sparkles, Type, Beaker } from "lucide-react";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 25 } }
+};
 
 export default function AdvancedStylingForm({ uiConfigStr }: { uiConfigStr: string | null }) {
   const [config, setConfig] = useState(() => {
@@ -81,493 +98,498 @@ export default function AdvancedStylingForm({ uiConfigStr }: { uiConfigStr: stri
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        
-        {/* Layout */}
-        <div className="space-y-3">
-          <Label>Layout dos Links</Label>
-          <Select value={config.layout || "default"} onValueChange={(val) => updateField("layout", val)}>
-            <SelectTrigger className="bg-black/50 border-white/10">
-              <SelectValue placeholder="Selecione o layout" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="default">Lista Vertical</SelectItem>
-              <SelectItem value="grid">Grid (Lado a Lado)</SelectItem>
-              <SelectItem value="masonry">Masonry</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Cursor */}
-        <div className="space-y-3">
-          <Label>Estilo do Cursor</Label>
-          <Select value={config.cursorStyle || "default"} onValueChange={(val) => updateField("cursorStyle", val)}>
-            <SelectTrigger className="bg-black/50 border-white/10">
-              <SelectValue placeholder="Selecione o cursor" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="default">Padrão</SelectItem>
-              <SelectItem value="glow">Glow Follower</SelectItem>
-              <SelectItem value="ring">Anel Dinâmico</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Accent Color */}
-        <div className="space-y-3">
-          <Label>Cor de Destaque (Accent)</Label>
-          <div className="flex gap-3">
-            <Input 
-              type="color" 
-              value={config.accentColor || "#ffffff"} 
-              onChange={(e) => updateField("accentColor", e.target.value)}
-              className="w-16 h-10 p-1 bg-black/50 border-white/10"
-            />
-            <Input 
-              value={config.accentColor || "#ffffff"} 
-              onChange={(e) => updateField("accentColor", e.target.value)}
-              className="flex-1 bg-black/50 border-white/10"
-            />
+    <form onSubmit={handleSubmit}>
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="space-y-10"
+      >
+        {/* 1. ESTILOS VISUAIS */}
+        <motion.div variants={itemVariants} className="p-6 border border-white/5 bg-white/[0.02] rounded-2xl space-y-6 backdrop-blur-md relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-purple-500 to-pink-500 opacity-60" />
+          
+          <div className="flex items-center gap-2 mb-2 text-white">
+            <Palette className="w-5 h-5 text-purple-400" />
+            <h3 className="text-lg font-bold tracking-wide">1. Estilos Visuais</h3>
           </div>
-        </div>
 
-        {/* Glow Color */}
-        <div className="space-y-3">
-          <Label>Cor da Sombra (Glow)</Label>
-          <Input 
-            value={config.glowColor || "rgba(255,255,255,0.1)"} 
-            onChange={(e) => updateField("glowColor", e.target.value)}
-            className="bg-black/50 border-white/10"
-            placeholder="rgba(255,255,255,0.1) ou #ff00ff"
-          />
-        </div>
-
-        {/* Border Radius */}
-        <div className="space-y-3">
-          <Label>Arredondamento das Bordas</Label>
-          <Input 
-            value={config.borderRadius || "12px"} 
-            onChange={(e) => updateField("borderRadius", e.target.value)}
-            className="bg-black/50 border-white/10"
-            placeholder="Ex: 0px, 12px, 9999px"
-          />
-        </div>
-
-        {/* Glass Intensity */}
-        <div className="space-y-3">
-          <Label>Intensidade do Vidro (Blur)</Label>
-          <Input 
-            value={config.glassIntensity || "10px"} 
-            onChange={(e) => updateField("glassIntensity", e.target.value)}
-            className="bg-black/50 border-white/10"
-            placeholder="Ex: 10px"
-          />
-        </div>
-
-        {/* Video Background */}
-        <div className="space-y-3 sm:col-span-2">
-          <Label>Fundo em Vídeo (URL)</Label>
-          <Input 
-            value={config.videoBgUrl || ""} 
-            onChange={(e) => updateField("videoBgUrl", e.target.value)}
-            className="bg-black/50 border-white/10"
-            placeholder="https://..."
-          />
-          <p className="text-xs text-white/50">Se preenchido e configurado na aba de Mídias como Vídeo, rodará em loop.</p>
-        </div>
-
-        {/* Custom CSS */}
-        <div className="space-y-3 sm:col-span-2">
-          <Label>CSS Customizado (Pro)</Label>
-          <Textarea 
-            value={config.customCss || ""} 
-            onChange={(e) => updateField("customCss", e.target.value)}
-            className="bg-black/50 border-white/10 font-mono text-sm min-h-[120px]"
-            placeholder=".meu-botao { color: red; }"
-          />
-        </div>
-
-        {/* Noise Overlay */}
-        <div className="space-y-3 sm:col-span-2 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
-          <div>
-            <Label className="text-base font-semibold">Filtro de Ruído (VHS Noise)</Label>
-            <p className="text-sm text-white/60">Adiciona uma textura granulada por cima do perfil.</p>
-          </div>
-          <Switch 
-            checked={!!config.noiseOverlay}
-            onCheckedChange={(checked) => updateField("noiseOverlay", checked)}
-          />
-        </div>
-
-        {/* --- SESSÃO DE ÁUDIO E MULTIMÍDIA --- */}
-        <div className="col-span-1 sm:col-span-2 pt-6 border-t border-white/10 mt-2">
-          <h3 className="text-lg font-bold mb-4">🎵 Áudio e Player (Parte 2)</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            
-            {/* Player Style */}
-            <div className="space-y-3">
-              <Label>Estilo do Player</Label>
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Layout dos Links</Label>
+              <Select value={config.layout || "default"} onValueChange={(val) => updateField("layout", val)}>
+                <SelectTrigger className="bg-black/40 border-white/10 hover:border-white/20 focus:border-purple-500/50 rounded-xl h-11 text-white">
+                  <SelectValue placeholder="Selecione o layout" />
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border border-white/10 text-white backdrop-blur-xl">
+                  <SelectItem value="default" className="focus:bg-white/10 focus:text-white cursor-pointer">Lista Vertical</SelectItem>
+                  <SelectItem value="grid" className="focus:bg-white/10 focus:text-white cursor-pointer">Grid (Lado a Lado)</SelectItem>
+                  <SelectItem value="masonry" className="focus:bg-white/10 focus:text-white cursor-pointer">Masonry</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Estilo do Cursor</Label>
+              <Select value={config.cursorStyle || "default"} onValueChange={(val) => updateField("cursorStyle", val)}>
+                <SelectTrigger className="bg-black/40 border-white/10 hover:border-white/20 focus:border-purple-500/50 rounded-xl h-11 text-white">
+                  <SelectValue placeholder="Selecione o cursor" />
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border border-white/10 text-white backdrop-blur-xl">
+                  <SelectItem value="default" className="focus:bg-white/10 focus:text-white cursor-pointer">Padrão</SelectItem>
+                  <SelectItem value="glow" className="focus:bg-white/10 focus:text-white cursor-pointer">Glow Follower</SelectItem>
+                  <SelectItem value="ring" className="focus:bg-white/10 focus:text-white cursor-pointer">Anel Dinâmico</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Cor de Destaque (Accent)</Label>
+              <div className="flex gap-3">
+                <Input 
+                  type="color" 
+                  value={config.accentColor || "#ffffff"} 
+                  onChange={(e) => updateField("accentColor", e.target.value)}
+                  className="w-14 h-11 p-1 bg-black/40 border-white/10 rounded-xl cursor-pointer"
+                />
+                <Input 
+                  value={config.accentColor || "#ffffff"} 
+                  onChange={(e) => updateField("accentColor", e.target.value)}
+                  className="flex-1 bg-black/40 border-white/10 hover:border-white/20 focus:border-purple-500/50 rounded-xl h-11 text-white font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Cor da Sombra (Glow)</Label>
+              <Input 
+                value={config.glowColor || "rgba(255,255,255,0.1)"} 
+                onChange={(e) => updateField("glowColor", e.target.value)}
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-purple-500/50 rounded-xl h-11 text-white font-mono"
+                placeholder="rgba(255,255,255,0.1) ou #ff00ff"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Arredondamento das Bordas</Label>
+              <Input 
+                value={config.borderRadius || "12px"} 
+                onChange={(e) => updateField("borderRadius", e.target.value)}
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-purple-500/50 rounded-xl h-11 text-white font-mono"
+                placeholder="Ex: 0px, 12px, 9999px"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Intensidade do Vidro (Blur)</Label>
+              <Input 
+                value={config.glassIntensity || "10px"} 
+                onChange={(e) => updateField("glassIntensity", e.target.value)}
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-purple-500/50 rounded-xl h-11 text-white font-mono"
+                placeholder="Ex: 10px"
+              />
+            </div>
+
+            <div className="space-y-2 sm:col-span-2">
+              <Label className="text-white/80 font-medium">Fundo em Vídeo (URL)</Label>
+              <Input 
+                value={config.videoBgUrl || ""} 
+                onChange={(e) => updateField("videoBgUrl", e.target.value)}
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-purple-500/50 rounded-xl h-11 text-white"
+                placeholder="https://..."
+              />
+              <p className="text-xs text-white/45">Para rodar em loop no fundo da sua página.</p>
+            </div>
+
+            <div className="space-y-2 sm:col-span-2">
+              <Label className="text-white/80 font-medium">CSS Customizado (Pro)</Label>
+              <Textarea 
+                value={config.customCss || ""} 
+                onChange={(e) => updateField("customCss", e.target.value)}
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-purple-500/50 rounded-xl font-mono text-sm min-h-[110px] text-white"
+                placeholder=".meu-botao { color: red; }"
+              />
+            </div>
+
+            <div className="space-y-2 sm:col-span-2 flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
+              <div>
+                <Label className="text-white/90 font-semibold cursor-pointer">Filtro de Ruído (VHS Noise)</Label>
+                <p className="text-xs text-white/50">Adiciona uma textura granulada por cima do perfil.</p>
+              </div>
+              <Switch 
+                checked={!!config.noiseOverlay}
+                onCheckedChange={(checked) => updateField("noiseOverlay", checked)}
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* 2. ÁUDIO E PLAYER */}
+        <motion.div variants={itemVariants} className="p-6 border border-white/5 bg-white/[0.02] rounded-2xl space-y-6 backdrop-blur-md relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 to-blue-500 opacity-60" />
+
+          <div className="flex items-center gap-2 mb-2 text-white">
+            <Volume2 className="w-5 h-5 text-cyan-400" />
+            <h3 className="text-lg font-bold tracking-wide">2. Áudio e Player</h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Estilo do Player</Label>
               <Select value={config.playerStyle || "minimalist"} onValueChange={(val) => updateField("playerStyle", val)}>
-                <SelectTrigger className="bg-black/50 border-white/10">
+                <SelectTrigger className="bg-black/40 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl h-11 text-white">
                   <SelectValue placeholder="Selecione o estilo" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="minimalist">Minimalista</SelectItem>
-                  <SelectItem value="neon">Neon (Glow)</SelectItem>
-                  <SelectItem value="retro">Retrô (Pixel)</SelectItem>
+                <SelectContent className="bg-black/90 border border-white/10 text-white backdrop-blur-xl">
+                  <SelectItem value="minimalist" className="focus:bg-white/10 focus:text-white cursor-pointer">Minimalista</SelectItem>
+                  <SelectItem value="neon" className="focus:bg-white/10 focus:text-white cursor-pointer">Neon (Glow)</SelectItem>
+                  <SelectItem value="retro" className="focus:bg-white/10 focus:text-white cursor-pointer">Retrô (Pixel)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Player Position */}
-            <div className="space-y-3">
-              <Label>Posição do Player</Label>
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Posição do Player</Label>
               <Select value={config.playerPosition || "bottom-center"} onValueChange={(val) => updateField("playerPosition", val)}>
-                <SelectTrigger className="bg-black/50 border-white/10">
+                <SelectTrigger className="bg-black/40 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl h-11 text-white">
                   <SelectValue placeholder="Selecione a posição" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bottom-center">Inferior Central</SelectItem>
-                  <SelectItem value="bottom-left">Inferior Esquerdo</SelectItem>
-                  <SelectItem value="top-right">Superior Direito</SelectItem>
+                <SelectContent className="bg-black/90 border border-white/10 text-white backdrop-blur-xl">
+                  <SelectItem value="bottom-center" className="focus:bg-white/10 focus:text-white cursor-pointer">Inferior Central</SelectItem>
+                  <SelectItem value="bottom-left" className="focus:bg-white/10 focus:text-white cursor-pointer">Inferior Esquerdo</SelectItem>
+                  <SelectItem value="top-right" className="focus:bg-white/10 focus:text-white cursor-pointer">Superior Direito</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Loading Text */}
-            <div className="space-y-3">
-              <Label>Texto de Entrada</Label>
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Texto de Entrada</Label>
               <Input 
                 value={config.loadingText || "Click to Enter"} 
                 onChange={(e) => updateField("loadingText", e.target.value)}
-                className="bg-black/50 border-white/10"
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl h-11 text-white"
                 placeholder="Ex: Click to Enter"
               />
             </div>
 
-            {/* Enter Animation */}
-            <div className="space-y-3">
-              <Label>Animação de Entrada</Label>
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Animação de Entrada</Label>
               <Select value={config.enterAnimation || "fade"} onValueChange={(val) => updateField("enterAnimation", val)}>
-                <SelectTrigger className="bg-black/50 border-white/10">
+                <SelectTrigger className="bg-black/40 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl h-11 text-white">
                   <SelectValue placeholder="Selecione a animação" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fade">Fade Suave</SelectItem>
-                  <SelectItem value="zoom">Zoom Out</SelectItem>
-                  <SelectItem value="glitch">Glitch Attack</SelectItem>
+                <SelectContent className="bg-black/90 border border-white/10 text-white backdrop-blur-xl">
+                  <SelectItem value="fade" className="focus:bg-white/10 focus:text-white cursor-pointer">Fade Suave</SelectItem>
+                  <SelectItem value="zoom" className="focus:bg-white/10 focus:text-white cursor-pointer">Zoom Out</SelectItem>
+                  <SelectItem value="glitch" className="focus:bg-white/10 focus:text-white cursor-pointer">Glitch Attack</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Night Audio */}
-            <div className="space-y-3 sm:col-span-2">
-              <Label>Música Noturna (URL - Opcional)</Label>
+            <div className="space-y-2 sm:col-span-2">
+              <Label className="text-white/80 font-medium">Música Noturna (URL - Opcional)</Label>
               <Input 
                 value={config.nightAudioUrl || ""} 
                 onChange={(e) => updateField("nightAudioUrl", e.target.value)}
-                className="bg-black/50 border-white/10"
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-cyan-500/50 rounded-xl h-11 text-white"
                 placeholder="https://..."
               />
-              <p className="text-xs text-white/50">Se preenchido, o site tocará essa música de noite (18h-06h) em vez da música principal.</p>
+              <p className="text-xs text-white/45">Se preenchido, o site tocará essa música de noite (18h-06h) em vez da música principal.</p>
             </div>
 
-            {/* Reverb Toggle */}
-            <div className="space-y-3 sm:col-span-2 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div className="space-y-2 sm:col-span-2 flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
               <div>
-                <Label className="text-base font-semibold">Efeito de Áudio 3D (Reverb/Catedral)</Label>
-                <p className="text-sm text-white/60">Aplica eco ao áudio de fundo usando Web Audio API.</p>
+                <Label className="text-white/90 font-semibold cursor-pointer">Efeito de Áudio 3D (Reverb/Catedral)</Label>
+                <p className="text-xs text-white/50">Aplica eco ao áudio de fundo usando Web Audio API.</p>
               </div>
               <Switch 
                 checked={!!config.reverbEffect}
                 onCheckedChange={(checked) => updateField("reverbEffect", checked)}
               />
             </div>
-
           </div>
-        </div>
+        </motion.div>
 
-        {/* --- SESSÃO DE INTERATIVIDADE (PARTE 3) --- */}
-        <div className="col-span-1 sm:col-span-2 pt-6 border-t border-white/10 mt-2">
-          <h3 className="text-lg font-bold mb-4">✨ Interatividade e Animações (Parte 3)</h3>
+        {/* 3. INTERATIVIDADE E ANIMAÇÕES */}
+        <motion.div variants={itemVariants} className="p-6 border border-white/5 bg-white/[0.02] rounded-2xl space-y-6 backdrop-blur-md relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500 to-teal-500 opacity-60" />
+
+          <div className="flex items-center gap-2 mb-2 text-white">
+            <Sparkles className="w-5 h-5 text-emerald-400" />
+            <h3 className="text-lg font-bold tracking-wide">3. Interatividade e Animações</h3>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-            {/* Link Hover Effect */}
-            <div className="space-y-3">
-              <Label>Efeito Hover nos Links</Label>
+            <div className="space-y-2 sm:col-span-2">
+              <Label className="text-white/80 font-medium">Efeito Hover nos Links</Label>
               <Select value={config.linkHoverEffect || "default"} onValueChange={(val) => updateField("linkHoverEffect", val)}>
-                <SelectTrigger className="bg-black/50 border-white/10">
+                <SelectTrigger className="bg-black/40 border-white/10 hover:border-white/20 focus:border-emerald-500/50 rounded-xl h-11 text-white">
                   <SelectValue placeholder="Selecione o efeito" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default">Magnético (Padrão)</SelectItem>
-                  <SelectItem value="glow">Glow Intensivo</SelectItem>
-                  <SelectItem value="ripple">Ripple (Ondas)</SelectItem>
-                  <SelectItem value="shake">Tremor (Shake)</SelectItem>
+                <SelectContent className="bg-black/90 border border-white/10 text-white backdrop-blur-xl">
+                  <SelectItem value="default" className="focus:bg-white/10 focus:text-white cursor-pointer">Magnético (Padrão)</SelectItem>
+                  <SelectItem value="glow" className="focus:bg-white/10 focus:text-white cursor-pointer">Glow Intensivo</SelectItem>
+                  <SelectItem value="ripple" className="focus:bg-white/10 focus:text-white cursor-pointer">Ripple (Ondas)</SelectItem>
+                  <SelectItem value="shake" className="focus:bg-white/10 focus:text-white cursor-pointer">Tremor (Shake)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Tilt 3D */}
-            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
               <div>
-                <Label className="font-semibold">Tilt 3D no Hover</Label>
-                <p className="text-xs text-white/60">O card se inclina com o mouse.</p>
+                <Label className="text-white/90 font-semibold cursor-pointer">Tilt 3D no Hover</Label>
+                <p className="text-xs text-white/50">O card do perfil se inclina com o mouse.</p>
               </div>
               <Switch checked={!!config.enable3dTilt} onCheckedChange={(val) => updateField("enable3dTilt", val)} />
             </div>
 
-            {/* Typewriter Bio */}
-            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
               <div>
-                <Label className="font-semibold">Bio Digitada (Typewriter)</Label>
-                <p className="text-xs text-white/60">Digita a bio letra por letra.</p>
+                <Label className="text-white/90 font-semibold cursor-pointer">Bio Digitada (Typewriter)</Label>
+                <p className="text-xs text-white/50">Digita a bio letra por letra.</p>
               </div>
               <Switch checked={!!config.typewriterBio} onCheckedChange={(val) => updateField("typewriterBio", val)} />
             </div>
 
-            {/* Avatar Pulse */}
-            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
               <div>
-                <Label className="font-semibold">Avatar Pulsante</Label>
-                <p className="text-xs text-white/60">Borda respira suavemente.</p>
+                <Label className="text-white/90 font-semibold cursor-pointer">Avatar Pulsante</Label>
+                <p className="text-xs text-white/50">Borda respira suavemente.</p>
               </div>
               <Switch checked={!!config.avatarPulse} onCheckedChange={(val) => updateField("avatarPulse", val)} />
             </div>
 
-            {/* Avatar Glitch */}
-            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
               <div>
-                <Label className="font-semibold">Avatar Glitch Hover</Label>
-                <p className="text-xs text-white/60">Falha digital no mouse.</p>
+                <Label className="text-white/90 font-semibold cursor-pointer">Avatar Glitch Hover</Label>
+                <p className="text-xs text-white/50">Efeito de falha digital no mouse.</p>
               </div>
               <Switch checked={!!config.glitchAvatar} onCheckedChange={(val) => updateField("glitchAvatar", val)} />
             </div>
 
-            {/* Staggered Entry */}
-            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
               <div>
-                <Label className="font-semibold">Entrada em Cascata</Label>
-                <p className="text-xs text-white/60">Links entram um por um.</p>
+                <Label className="text-white/90 font-semibold cursor-pointer">Entrada em Cascata</Label>
+                <p className="text-xs text-white/50">Links entram um por um.</p>
               </div>
               <Switch checked={!!config.staggeredEntry} onCheckedChange={(val) => updateField("staggeredEntry", val)} />
             </div>
 
-            {/* Confetti */}
-            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
               <div>
-                <Label className="font-semibold">Explosão de Confete</Label>
-                <p className="text-xs text-white/60">Ao clicar em botões no perfil.</p>
+                <Label className="text-white/90 font-semibold cursor-pointer">Explosão de Confete</Label>
+                <p className="text-xs text-white/50">Ao clicar em botões no perfil.</p>
               </div>
               <Switch checked={!!config.confettiEnabled} onCheckedChange={(val) => updateField("confettiEnabled", val)} />
             </div>
 
-            {/* Particle Interaction */}
-            <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors sm:col-span-2">
               <div>
-                <Label className="font-semibold">Partículas Repelidas</Label>
-                <p className="text-xs text-white/60">Neve/Matrix fogem do cursor.</p>
+                <Label className="text-white/90 font-semibold cursor-pointer">Partículas Repelidas</Label>
+                <p className="text-xs text-white/50">Neve/Matrix fogem do cursor do mouse.</p>
               </div>
               <Switch checked={!!config.particleInteraction} onCheckedChange={(val) => updateField("particleInteraction", val)} />
             </div>
-
           </div>
-        </div>
+        </motion.div>
 
-      </div>
+        {/* 4. TIPOGRAFIA E TEXTO */}
+        <motion.div variants={itemVariants} className="p-6 border border-white/5 bg-white/[0.02] rounded-2xl space-y-6 backdrop-blur-md relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-orange-500 to-red-500 opacity-60" />
 
-      {/* --- SESSÃO DE TIPOGRAFIA E TEXTO (PARTE 6) --- */}
-      <div className="col-span-1 sm:col-span-2 pt-6 border-t border-white/10 mt-2">
-        <h3 className="text-lg font-bold mb-4">🔤 Tipografia e Texto (Parte 6)</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          
-          {/* Font Family */}
-          <div className="space-y-3">
-            <Label>Fonte Principal (Google Fonts)</Label>
-            <Select value={config.fontFamily || "Inter"} onValueChange={(val) => updateField("fontFamily", val)}>
-              <SelectTrigger className="bg-black/50 border-white/10">
-                <SelectValue placeholder="Selecione a fonte" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Inter">Inter (Padrão)</SelectItem>
-                <SelectItem value="Roboto">Roboto</SelectItem>
-                <SelectItem value="Playfair Display">Playfair Display (Elegante)</SelectItem>
-                <SelectItem value="Outfit">Outfit (Moderna)</SelectItem>
-                <SelectItem value="Fira Code">Fira Code (Dev)</SelectItem>
-                <SelectItem value="Space Grotesk">Space Grotesk</SelectItem>
-                <SelectItem value="Syne">Syne (Arrojada)</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-2 mb-2 text-white">
+            <Type className="w-5 h-5 text-orange-400" />
+            <h3 className="text-lg font-bold tracking-wide">4. Tipografia e Texto</h3>
           </div>
 
-          {/* Text Alignment */}
-          <div className="space-y-3">
-            <Label>Alinhamento do Texto</Label>
-            <Select value={config.textAlign || "center"} onValueChange={(val) => updateField("textAlign", val)}>
-              <SelectTrigger className="bg-black/50 border-white/10">
-                <SelectValue placeholder="Alinhamento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="left">Esquerda</SelectItem>
-                <SelectItem value="center">Centro</SelectItem>
-                <SelectItem value="right">Direita</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Letter Spacing */}
-          <div className="space-y-3">
-            <Label>Espaçamento de Letras (Tracking)</Label>
-            <Input 
-              value={config.letterSpacing || "normal"} 
-              onChange={(e) => updateField("letterSpacing", e.target.value)}
-              className="bg-black/50 border-white/10"
-              placeholder="ex: normal, 1px, 0.1em"
-            />
-          </div>
-
-          {/* Line Height */}
-          <div className="space-y-3">
-            <Label>Altura da Linha (Line-height)</Label>
-            <Input 
-              value={config.lineHeight || "1.5"} 
-              onChange={(e) => updateField("lineHeight", e.target.value)}
-              className="bg-black/50 border-white/10"
-              placeholder="ex: 1.5, 2, 150%"
-            />
-          </div>
-
-          {/* Text Transform */}
-          <div className="space-y-3">
-            <Label>Caixa do Texto</Label>
-            <Select value={config.textTransform || "none"} onValueChange={(val) => updateField("textTransform", val)}>
-              <SelectTrigger className="bg-black/50 border-white/10">
-                <SelectValue placeholder="Caixa do texto" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Padrão</SelectItem>
-                <SelectItem value="uppercase">TUDO MAIÚSCULO</SelectItem>
-                <SelectItem value="lowercase">tudo minúsculo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Text Gradient */}
-          <div className="space-y-3">
-            <Label>Gradiente no Nome (Opcional)</Label>
-            <Input 
-              value={config.textGradient || ""} 
-              onChange={(e) => updateField("textGradient", e.target.value)}
-              className="bg-black/50 border-white/10"
-              placeholder="ex: linear-gradient(to right, #ff0000, #00ff00)"
-            />
-          </div>
-
-          {/* Text Shadow */}
-          <div className="space-y-3 sm:col-span-2">
-            <Label>Sombra/Brilho no Texto (Text Shadow)</Label>
-            <Input 
-              value={config.textShadow || ""} 
-              onChange={(e) => updateField("textShadow", e.target.value)}
-              className="bg-black/50 border-white/10"
-              placeholder="ex: 0 0 10px rgba(255,255,255,0.5)"
-            />
-          </div>
-
-          {/* Mono Font Toggle */}
-          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
-            <div>
-              <Label className="font-semibold">Forçar Fonte Monoespaçada</Label>
-              <p className="text-xs text-white/60">Aplica estilo de código em tudo.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Fonte Principal (Google Fonts)</Label>
+              <Select value={config.fontFamily || "Inter"} onValueChange={(val) => updateField("fontFamily", val)}>
+                <SelectTrigger className="bg-black/40 border-white/10 hover:border-white/20 focus:border-orange-500/50 rounded-xl h-11 text-white">
+                  <SelectValue placeholder="Selecione a fonte" />
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border border-white/10 text-white backdrop-blur-xl">
+                  <SelectItem value="Inter" className="focus:bg-white/10 focus:text-white cursor-pointer">Inter (Padrão)</SelectItem>
+                  <SelectItem value="Roboto" className="focus:bg-white/10 focus:text-white cursor-pointer">Roboto</SelectItem>
+                  <SelectItem value="Playfair Display" className="focus:bg-white/10 focus:text-white cursor-pointer">Playfair Display (Elegante)</SelectItem>
+                  <SelectItem value="Outfit" className="focus:bg-white/10 focus:text-white cursor-pointer">Outfit (Moderna)</SelectItem>
+                  <SelectItem value="Fira Code" className="focus:bg-white/10 focus:text-white cursor-pointer">Fira Code (Dev)</SelectItem>
+                  <SelectItem value="Space Grotesk" className="focus:bg-white/10 focus:text-white cursor-pointer">Space Grotesk</SelectItem>
+                  <SelectItem value="Syne" className="focus:bg-white/10 focus:text-white cursor-pointer">Syne (Arrojada)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Switch checked={!!config.monoFont} onCheckedChange={(val) => updateField("monoFont", val)} />
-          </div>
 
-          {/* Rotating Bio Toggle */}
-          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
-            <div>
-              <Label className="font-semibold">Bio com Palavras Rotativas</Label>
-              <p className="text-xs text-white/60">Gira palavras pré-definidas na sua bio.</p>
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Alinhamento do Texto</Label>
+              <Select value={config.textAlign || "center"} onValueChange={(val) => updateField("textAlign", val)}>
+                <SelectTrigger className="bg-black/40 border-white/10 hover:border-white/20 focus:border-orange-500/50 rounded-xl h-11 text-white">
+                  <SelectValue placeholder="Alinhamento" />
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border border-white/10 text-white backdrop-blur-xl">
+                  <SelectItem value="left" className="focus:bg-white/10 focus:text-white cursor-pointer">Esquerda</SelectItem>
+                  <SelectItem value="center" className="focus:bg-white/10 focus:text-white cursor-pointer">Centro</SelectItem>
+                  <SelectItem value="right" className="focus:bg-white/10 focus:text-white cursor-pointer">Direita</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Switch checked={!!config.rotatingBio} onCheckedChange={(val) => updateField("rotatingBio", val)} />
-          </div>
 
-          {/* Rotating Words List */}
-          {config.rotatingBio && (
-            <div className="space-y-3 sm:col-span-2">
-              <Label>Palavras Rotativas (separadas por vírgula)</Label>
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Espaçamento de Letras (Tracking)</Label>
               <Input 
-                value={config.rotatingWords || ""} 
-                onChange={(e) => updateField("rotatingWords", e.target.value)}
-                className="bg-black/50 border-white/10"
-                placeholder="ex: Designer, Developer, Creator"
+                value={config.letterSpacing || "normal"} 
+                onChange={(e) => updateField("letterSpacing", e.target.value)}
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-orange-500/50 rounded-xl h-11 text-white font-mono"
+                placeholder="ex: normal, 1px, 0.1em"
               />
-              <p className="text-xs text-white/50">Coloque um par de chaves {'{}'} na sua Bio real onde as palavras devem aparecer!</p>
             </div>
-          )}
 
-        </div>
-      </div>
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Altura da Linha (Line-height)</Label>
+              <Input 
+                value={config.lineHeight || "1.5"} 
+                onChange={(e) => updateField("lineHeight", e.target.value)}
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-orange-500/50 rounded-xl h-11 text-white font-mono"
+                placeholder="ex: 1.5, 2, 150%"
+              />
+            </div>
 
-      {/* --- SESSÃO EXPERIMENTAL (PARTE 7) --- */}
-      <div className="col-span-1 sm:col-span-2 pt-6 border-t border-white/10 mt-2">
-        <h3 className="text-lg font-bold mb-4">🚀 Experimental (Parte 7)</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Caixa do Texto</Label>
+              <Select value={config.textTransform || "none"} onValueChange={(val) => updateField("textTransform", val)}>
+                <SelectTrigger className="bg-black/40 border-white/10 hover:border-white/20 focus:border-orange-500/50 rounded-xl h-11 text-white">
+                  <SelectValue placeholder="Caixa do texto" />
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border border-white/10 text-white backdrop-blur-xl">
+                  <SelectItem value="none" className="focus:bg-white/10 focus:text-white cursor-pointer">Padrão</SelectItem>
+                  <SelectItem value="uppercase" className="focus:bg-white/10 focus:text-white cursor-pointer">TUDO MAIÚSCULO</SelectItem>
+                  <SelectItem value="lowercase" className="focus:bg-white/10 focus:text-white cursor-pointer">tudo minúsculo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Manual Status */}
-          <div className="space-y-3 sm:col-span-2">
-            <Label>Status Manual (Aparece no topo do perfil)</Label>
-            <Input 
-              value={config.manualStatus || ""} 
-              onChange={(e) => updateField("manualStatus", e.target.value)}
-              className="bg-black/50 border-white/10"
-              placeholder="ex: 🌙 Dormindo, 💻 Codando, 🎮 Jogando Valorant"
-            />
+            <div className="space-y-2">
+              <Label className="text-white/80 font-medium">Gradiente no Nome (Opcional)</Label>
+              <Input 
+                value={config.textGradient || ""} 
+                onChange={(e) => updateField("textGradient", e.target.value)}
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-orange-500/50 rounded-xl h-11 text-white"
+                placeholder="ex: linear-gradient(to right, #ff0000, #00ff00)"
+              />
+            </div>
+
+            <div className="space-y-2 sm:col-span-2">
+              <Label className="text-white/80 font-medium">Sombra/Brilho no Texto (Text Shadow)</Label>
+              <Input 
+                value={config.textShadow || ""} 
+                onChange={(e) => updateField("textShadow", e.target.value)}
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-orange-500/50 rounded-xl h-11 text-white font-mono"
+                placeholder="ex: 0 0 10px rgba(255,255,255,0.5)"
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
+              <div>
+                <Label className="text-white/90 font-semibold cursor-pointer">Forçar Fonte Monoespaçada</Label>
+                <p className="text-xs text-white/50">Aplica estilo de código em toda a página.</p>
+              </div>
+              <Switch checked={!!config.monoFont} onCheckedChange={(val) => updateField("monoFont", val)} />
+            </div>
+
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
+              <div>
+                <Label className="text-white/90 font-semibold cursor-pointer">Bio com Palavras Rotativas</Label>
+                <p className="text-xs text-white/50">Gira palavras pré-definidas na sua bio.</p>
+              </div>
+              <Switch checked={!!config.rotatingBio} onCheckedChange={(val) => updateField("rotatingBio", val)} />
+            </div>
+
+            {config.rotatingBio && (
+              <div className="space-y-2 sm:col-span-2">
+                <Label className="text-white/80 font-medium">Palavras Rotativas (separadas por vírgula)</Label>
+                <Input 
+                  value={config.rotatingWords || ""} 
+                  onChange={(e) => updateField("rotatingWords", e.target.value)}
+                  className="bg-black/40 border-white/10 hover:border-white/20 focus:border-orange-500/50 rounded-xl h-11 text-white"
+                  placeholder="ex: Designer, Developer, Creator"
+                />
+                <p className="text-xs text-white/45">Coloque um par de chaves {'{}'} na sua Bio real onde as palavras devem aparecer!</p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* 5. EXPERIMENTAL */}
+        <motion.div variants={itemVariants} className="p-6 border border-white/5 bg-white/[0.02] rounded-2xl space-y-6 backdrop-blur-md relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-yellow-500 to-amber-500 opacity-60" />
+
+          <div className="flex items-center gap-2 mb-2 text-white">
+            <Beaker className="w-5 h-5 text-yellow-400" />
+            <h3 className="text-lg font-bold tracking-wide">5. Experimental</h3>
           </div>
 
-          {/* Guestbook Toggle */}
-          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
-            <div>
-              <Label className="font-semibold">Mural de Recados (Guestbook)</Label>
-              <p className="text-xs text-white/60">Permitir que visitantes deixem mensagens.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-2 sm:col-span-2">
+              <Label className="text-white/80 font-medium">Status Manual (Aparece no topo do perfil)</Label>
+              <Input 
+                value={config.manualStatus || ""} 
+                onChange={(e) => updateField("manualStatus", e.target.value)}
+                className="bg-black/40 border-white/10 hover:border-white/20 focus:border-yellow-500/50 rounded-xl h-11 text-white"
+                placeholder="ex: 🌙 Dormindo, 💻 Codando, 🎮 Jogando Valorant"
+              />
             </div>
-            <Switch checked={!!config.enableGuestbook} onCheckedChange={(val) => updateField("enableGuestbook", val)} />
-          </div>
 
-          {/* Rating Toggle */}
-          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
-            <div>
-              <Label className="font-semibold">Sistema de Avaliação</Label>
-              <p className="text-xs text-white/60">Visitantes podem avaliar com 5 estrelas.</p>
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
+              <div>
+                <Label className="text-white/90 font-semibold cursor-pointer">Mural de Recados (Guestbook)</Label>
+                <p className="text-xs text-white/50">Permitir que visitantes deixem mensagens públicas.</p>
+              </div>
+              <Switch checked={!!config.enableGuestbook} onCheckedChange={(val) => updateField("enableGuestbook", val)} />
             </div>
-            <Switch checked={!!config.enableRating} onCheckedChange={(val) => updateField("enableRating", val)} />
-          </div>
 
-          {/* Visitor Themes Toggle */}
-          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
-            <div>
-              <Label className="font-semibold">Temas do Visitante</Label>
-              <p className="text-xs text-white/60">Mostra o botão Sol/Lua para inverter as cores do site.</p>
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
+              <div>
+                <Label className="text-white/90 font-semibold cursor-pointer">Sistema de Avaliação</Label>
+                <p className="text-xs text-white/50">Visitantes podem avaliar com 5 estrelas.</p>
+              </div>
+              <Switch checked={!!config.enableRating} onCheckedChange={(val) => updateField("enableRating", val)} />
             </div>
-            <Switch checked={!!config.enableVisitorThemes} onCheckedChange={(val) => updateField("enableVisitorThemes", val)} />
-          </div>
 
-          {/* Focus Mode Toggle */}
-          <div className="space-y-3 flex items-center justify-between p-4 border border-white/10 rounded-xl bg-white/5">
-            <div>
-              <Label className="font-semibold">Modo Foco (Zen)</Label>
-              <p className="text-xs text-white/60">Permitir aos visitantes esconder animações e widgets.</p>
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
+              <div>
+                <Label className="text-white/90 font-semibold cursor-pointer">Temas do Visitante</Label>
+                <p className="text-xs text-white/50">Mostra o botão Sol/Lua para inverter as cores.</p>
+              </div>
+              <Switch checked={!!config.enableVisitorThemes} onCheckedChange={(val) => updateField("enableVisitorThemes", val)} />
             </div>
-            <Switch checked={!!config.enableFocusMode} onCheckedChange={(val) => updateField("enableFocusMode", val)} />
+
+            <div className="flex items-center justify-between p-4 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
+              <div>
+                <Label className="text-white/90 font-semibold cursor-pointer">Modo Foco (Zen)</Label>
+                <p className="text-xs text-white/50">Permitir esconder animações e widgets pesados.</p>
+              </div>
+              <Switch checked={!!config.enableFocusMode} onCheckedChange={(val) => updateField("enableFocusMode", val)} />
+            </div>
           </div>
+        </motion.div>
 
-        </div>
-      </div>
-
-      <Button type="submit" className="w-full sm:w-auto mt-6" disabled={isSaving}>
-        {isSaving ? "Salvando..." : "Salvar Estilos Avançados"}
-      </Button>
+        {/* Save Button */}
+        <motion.div variants={itemVariants} className="pt-4">
+          <Button 
+            type="submit" 
+            className="w-full h-12 rounded-xl bg-white text-black hover:bg-white/90 font-bold transition-all hover:scale-[1.01] active:scale-[0.99] shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] disabled:opacity-50 cursor-pointer"
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <div className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                Salvando Estilos...
+              </div>
+            ) : "Salvar Estilos Avançados"}
+          </Button>
+        </motion.div>
+      </motion.div>
     </form>
   );
 }

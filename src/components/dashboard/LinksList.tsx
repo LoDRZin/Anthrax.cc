@@ -24,16 +24,16 @@ function SortableItem(props: { id: string; link: Link; onDelete: (id: string) =>
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-4 p-4 bg-black/40 border border-white/10 rounded-xl backdrop-blur-md mb-2 ${isDragging ? 'opacity-50 ring-2 ring-primary' : ''}`}
+      className={`flex items-center gap-4 p-4 bg-white/[0.02] border border-white/5 hover:border-white/10 rounded-xl backdrop-blur-md mb-3 transition-colors ${isDragging ? 'opacity-50 ring-2 ring-purple-500/50 bg-white/[0.05]' : ''}`}
     >
-      <button {...attributes} {...listeners} className="cursor-grab text-muted-foreground hover:text-white">
+      <button {...attributes} {...listeners} className="cursor-grab text-white/30 hover:text-white transition-colors">
         <GripVertical className="h-5 w-5" />
       </button>
       <div className="flex-1">
         <p className="font-semibold text-white">{props.link.title}</p>
-        <p className="text-sm text-muted-foreground truncate">{props.link.url}</p>
+        <p className="text-sm text-white/40 truncate">{props.link.url}</p>
       </div>
-      <Button variant="ghost" size="icon" onClick={() => props.onDelete(props.id)} className="text-red-400 hover:text-red-300 hover:bg-red-900/20">
+      <Button variant="ghost" size="icon" onClick={() => props.onDelete(props.id)} className="text-red-400/80 hover:text-red-300 hover:bg-red-500/10 rounded-lg h-9 w-9 transition-all cursor-pointer">
         <Trash2 className="h-4 w-4" />
       </Button>
     </div>

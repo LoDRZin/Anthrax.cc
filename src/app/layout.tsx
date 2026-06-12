@@ -1,7 +1,9 @@
-
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Anthrax.cc",
-  description: "Seu Link in Bio customizável com foco gamer.",
+  description: "O Link in Bio Gamer Definitivo",
 };
 
 export default function RootLayout({
@@ -27,11 +29,11 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark scroll-smooth`}
-      style={{ colorScheme: 'dark' }}
+      className={`${geistSans.variable} ${geistMono.variable} h-full dark`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         {children}
         <Toaster theme="dark" />
       </body>

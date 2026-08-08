@@ -4,14 +4,16 @@ import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
-import WebGLBackground from "@/components/public/WebGLBackground";
+import InteractiveBackground from "@/components/public/InteractiveBackground";
 
 export default function Home() {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center p-6 md:p-24 bg-[#030303] text-white overflow-hidden font-sans select-none">
       
-      {/* 3D WebGL Background (Stars Scene) */}
-      <WebGLBackground scene="stars" />
+      {/* Interactive Line Background */}
+      <div className="absolute inset-0 z-0 pointer-events-auto">
+        <InteractiveBackground strokeColor="#FF0000" backgroundColor="#000000" />
+      </div>
 
       {/* Gradient overlay to soften WebGL */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-[#030303]/60 to-[#030303] z-1 pointer-events-none" />

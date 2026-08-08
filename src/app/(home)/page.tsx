@@ -15,7 +15,7 @@ export default function Home() {
         <InteractiveBackground 
           strokeColor="#FF0000" 
           backgroundColor="#000000" 
-          count={20} 
+          count={40} 
           resolution={35} 
         />
       </div>

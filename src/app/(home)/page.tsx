@@ -12,7 +12,12 @@ export default function Home() {
       
       {/* Interactive Line Background */}
       <div className="absolute inset-0 z-0 pointer-events-auto">
-        <InteractiveBackground strokeColor="#FF0000" backgroundColor="#000000" />
+        <InteractiveBackground 
+          strokeColor="#FF0000" 
+          backgroundColor="#000000" 
+          count={20} 
+          resolution={35} 
+        />
       </div>
 
       {/* Gradient overlay to soften WebGL */}
